@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_number": "944598984328",
+    "firebase_url": "https://bbook-3da18-default-rtdb.firebaseio.com",
+    "project_id": "bbook-3da18",
+    "storage_bucket": "bbook-3da18.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944598984328:android:d76330f041a849024ba13d",
+        "android_client_info": {
+          "package_name": "hcmute.edu.vn.loclinhvabao.carex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3SO5YtmTjoROvInrx7reRefnCeGtdFYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944598984328:android:942ff26ecf6369614ba13d",
+        "android_client_info": {
+          "package_name": "hcmute.edu.vn.loclinhvabao.healthtracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "944598984328-mekk86p3melafjjd3j55tp5vb14qggek.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hcmute.edu.vn.loclinhvabao.healthtracker",
+            "certificate_hash": "e535bd9fcb74f5f4a7e03638a8b9f022854d2854"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3SO5YtmTjoROvInrx7reRefnCeGtdFYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

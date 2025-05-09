@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- CareX App Colors -->
+    <color name="primaryColor">#4A90E2</color>
+    <color name="primaryColorDark">#3A70B2</color>
+    <color name="primaryColorLight">#81B3FF</color>
+    <color name="secondaryColor">#FF5D7D</color>
+    <color name="accentColor">#FFB74D</color>
+    
+    <!-- Background Colors -->
+    <color name="backgroundColor">#F8F9FA</color>
+    <color name="surfaceColor">#FFFFFF</color>
+    <color name="cardBackground">#FFFFFF</color>
+    
+    <!-- Text Colors -->
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+    <color name="textHint">#9E9E9E</color>
+    
+    <!-- Workout Category Colors -->
+    <color name="runningColor">#4CAF50</color>
+    <color name="yogaColor">#5E35B1</color>
+    <color name="gymColor">#F44336</color>
+    <color name="cyclingColor">#2196F3</color>
+    <color name="swimmingColor">#00BCD4</color>
+</resources>

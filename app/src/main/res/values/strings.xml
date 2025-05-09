@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">CareX</string>
+    <!-- Navigation -->
+    <string name="training">Training</string>
+    <string name="discover">Discover</string>
+    <string name="report">Report</string>
+    <string name="settings">Settings</string>
+    
+    <!-- Training Fragment -->
+    <string name="workout_title">Today\'s Yoga Session</string>
+    <string name="calories_burned">Calories Burned</string>
+    <string name="steps_count">Steps</string>
+    <string name="workout_time">Session Time</string>
+    <string name="start_workout">Start Yoga Session</string>
+    <string name="recent_workouts">Recent Sessions</string>
+    <string name="view_all">View All</string>
+    <string name="run">Run</string>
+    <string name="yoga">Yoga</string>
+    <string name="gym">Gym</string>
+    <string name="cycling">Cycling</string>
+    <string name="swimming">Swimming</string>
+    
+    <!-- Yoga Categories -->
+    <string name="yoga_subtitle">Find your inner balance</string>
+    <string name="meditation">Meditation</string>
+    <string name="hatha_yoga">Hatha Yoga</string>
+    <string name="vinyasa_flow">Vinyasa Flow</string>
+    <string name="power_yoga">Power Yoga</string>
+    <string name="yin_yoga">Yin Yoga</string>
+    <string name="yoga_categories">Yoga Styles</string>
+    <string name="featured_sessions">Featured Sessions</string>
+    <string name="morning_yoga">Morning Yoga</string>
+    <string name="evening_wind_down">Evening Wind Down</string>
+    <string name="start_session">Start Session</string>
+</resources>
