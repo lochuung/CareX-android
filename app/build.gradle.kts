@@ -27,6 +27,13 @@ android {
             )
         }
     }
+
+    // Enable Data Binding
+    buildFeatures {
+        dataBinding = true
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -90,5 +97,8 @@ dependencies {
     implementation(libs.camerax.video)
     implementation(libs.camerax.view)
     implementation(libs.camerax.extensions)
+
+    // MPAndroidChart for charts and graphs
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
 }
