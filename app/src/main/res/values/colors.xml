@@ -26,4 +26,11 @@
     <color name="gymColor">#F44336</color>
     <color name="cyclingColor">#2196F3</color>
     <color name="swimmingColor">#00BCD4</color>
+
+    <color name="purple_500">#9C27B0</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="blue_500">#2196F3</color>
+
+    <color name="errorColor">#FF0000</color>
 </resources>

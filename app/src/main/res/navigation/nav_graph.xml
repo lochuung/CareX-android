@@ -21,11 +21,76 @@
         android:id="@+id/reportFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ReportFragment"
         android:label="fragment_report"
-        tools:layout="@layout/fragment_report" />
+        tools:layout="@layout/fragment_report">
+
+        <action
+            android:id="@+id/action_reportFragment_to_progressFragment"
+            app:destination="@id/progressFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+        <action
+            android:id="@+id/action_reportFragment_to_profileFragment"
+            app:destination="@id/profileFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/settingsFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+
+    <!-- Sub-destinations for Report section -->
+    <fragment
+        android:id="@+id/progressFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ProgressFragment"
+        android:label="fragment_progress"
+        tools:layout="@layout/fragment_progress">
+
+        <action
+            android:id="@+id/action_progressFragment_to_sessionDetailFragment"
+            app:destination="@id/sessionDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/sessionDetailFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.SessionDetailFragment"
+        android:label="fragment_session_detail"
+        tools:layout="@layout/fragment_session_detail">
+
+        <argument
+            android:name="sessionId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile">
+
+        <action
+            android:id="@+id/action_profileFragment_to_reminderSettingsFragment"
+            app:destination="@id/reminderSettingsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/reminderSettingsFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ReminderSettingsFragment"
+        android:label="fragment_reminder_settings"
+        tools:layout="@layout/fragment_reminder_settings" />
 </navigation>
