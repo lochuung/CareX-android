@@ -19,9 +19,7 @@
     <string name="yoga">Yoga</string>
     <string name="gym">Gym</string>
     <string name="cycling">Cycling</string>
-    <string name="swimming">Swimming</string>
-
-    <!-- Yoga Categories -->
+    <string name="swimming">Swimming</string>    <!-- Yoga Categories -->
     <string name="yoga_subtitle">Find your inner balance</string>
     <string name="meditation">Meditation</string>
     <string name="hatha_yoga">Hatha Yoga</string>
@@ -33,6 +31,7 @@
     <string name="morning_yoga">Morning Yoga</string>
     <string name="evening_wind_down">Evening Wind Down</string>
     <string name="start_session">Start Session</string>
+    <string name="start_yoga_session">Start Yoga Session</string>
     
     <!-- 10-Day Yoga Challenge -->
     <string name="yoga_challenge">10-Day Yoga Challenge</string>
