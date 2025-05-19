@@ -98,13 +98,13 @@ dependencies {
     implementation(libs.camerax.video)
     implementation(libs.camerax.view)
     implementation(libs.camerax.extensions)    // MPAndroidChart for charts and graphs
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.mpandroidchart)
     
     // YouTube Player
-    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+    implementation(libs.core)
 
     // Gson
-    implementation("com.google.code.gson:gson:2.13.1")
+    implementation(libs.gson)
 
     // WorkManager
     implementation(libs.workmanager.java)
@@ -114,9 +114,9 @@ dependencies {
     implementation(libs.hilt.work)
     annotationProcessor(libs.hilt.compiler.work)
 
-    implementation("androidx.lifecycle:lifecycle-livedata:2.9.0")
-    implementation("androidx.concurrent:concurrent-futures:1.1.0")
-    implementation("com.google.guava:guava:31.1-android")
+    implementation(libs.lifecycle.livedata)
+    implementation(libs.concurrent.futures)
+    implementation(libs.guava)
 
 
 }

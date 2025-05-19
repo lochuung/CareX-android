@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         assert navHostFragment != null;
         navController = navHostFragment.getNavController();        // Configure the top level destinations so that the back button doesn't appear
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.homeFragment, R.id.discoverFragment, R.id.reportFragment, R.id.settingsFragment
+                R.id.trainingFragment, R.id.homeFragment, R.id.discoverFragment, R.id.reportFragment, R.id.settingsFragment
         ).build();
         
         // Connect the navController with the BottomNavigationView

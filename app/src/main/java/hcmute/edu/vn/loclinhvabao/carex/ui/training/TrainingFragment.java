@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -19,14 +19,10 @@ import dagger.hilt.android.AndroidEntryPoint;
 import hcmute.edu.vn.loclinhvabao.carex.R;
 
 @AndroidEntryPoint
-public class TrainingFragment extends Fragment {
-
-    private CardView cardYoga, cardMeditation, cardHatha, cardVinyasa, cardPower;
-    private MaterialButton btnStartWorkout;
+public class TrainingFragment extends Fragment {    private CardView cardYoga, cardMeditation, cardHatha, cardVinyasa, cardPower;
+    private MaterialButton btnStartWorkout, btnStartYogaSession;
     private CardView cardRecentWorkout1, cardRecentWorkout2;
-    private TextView tvViewAll;
-
-    @Override
+    private TextView tvViewAll;@Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_training, container, false);
@@ -46,9 +42,9 @@ public class TrainingFragment extends Fragment {
         cardHatha = view.findViewById(R.id.card_hatha);
         cardVinyasa = view.findViewById(R.id.card_vinyasa);
         cardPower = view.findViewById(R.id.card_power);
-        
-        // Initialize workout start button
+          // Initialize workout start buttons
         btnStartWorkout = view.findViewById(R.id.btn_start_workout);
+        btnStartYogaSession = view.findViewById(R.id.btn_start_yoga_session);
         
         // Initialize recent workout cards
         cardRecentWorkout1 = view.findViewById(R.id.card_recent_workout_1);
@@ -60,24 +56,23 @@ public class TrainingFragment extends Fragment {
         // Set click listeners
         setClickListeners();
     }
-    
-    private void setClickListeners() {
+      private void setClickListeners() {
         // Set click listener for yoga category cards
-        cardYoga.setOnClickListener(v -> showYogaSessionDetails(R.string.yoga));
+        cardYoga.setOnClickListener(v -> navigateToYogaProgram());
         cardMeditation.setOnClickListener(v -> showYogaSessionDetails(R.string.meditation));
         cardHatha.setOnClickListener(v -> showYogaSessionDetails(R.string.hatha_yoga));
         cardVinyasa.setOnClickListener(v -> showYogaSessionDetails(R.string.vinyasa_flow));
         cardPower.setOnClickListener(v -> showYogaSessionDetails(R.string.power_yoga));
-        
-        // Set click listener for start workout button
+          // Set click listener for start workout buttons
         btnStartWorkout.setOnClickListener(v -> startYogaSession());
+        btnStartYogaSession.setOnClickListener(v -> navigateToYogaProgram());
         
         // Set click listeners for recent workout cards
-        cardRecentWorkout1.setOnClickListener(v -> showSessionDetails("Morning Yoga"));
-        cardRecentWorkout2.setOnClickListener(v -> showSessionDetails("Evening Wind Down"));
+        cardRecentWorkout1.setOnClickListener(v -> navigateToYogaProgram());
+        cardRecentWorkout2.setOnClickListener(v -> navigateToYogaProgram());
         
         // Set click listener for view all text
-        tvViewAll.setOnClickListener(v -> viewAllSessions());
+        tvViewAll.setOnClickListener(v -> navigateToYogaProgram());
     }
     
     private void showYogaSessionDetails(int yogaStyleResId) {
@@ -85,27 +80,33 @@ public class TrainingFragment extends Fragment {
         Toast.makeText(requireContext(), 
                 "Opening " + yogaStyle + " sessions", 
                 Toast.LENGTH_SHORT).show();
-        // TODO: Navigate to detailed yoga style screen
+        navigateToYogaProgram();
     }
     
     private void startYogaSession() {
         Toast.makeText(requireContext(), 
-                "Starting today's yoga session", 
+                "Starting yoga session", 
                 Toast.LENGTH_SHORT).show();
-        // TODO: Navigate to yoga session screen
+        navigateToYogaProgram();
+    }
+    
+    private void navigateToYogaProgram() {
+        // Navigate to the 10-day yoga program (HomeFragment)
+        Navigation.findNavController(requireView())
+                .navigate(R.id.action_trainingFragment_to_homeFragment);
     }
     
     private void showSessionDetails(String sessionName) {
         Toast.makeText(requireContext(), 
                 "Opening " + sessionName + " details", 
                 Toast.LENGTH_SHORT).show();
-        // TODO: Navigate to session details screen
+        navigateToYogaProgram();
     }
     
     private void viewAllSessions() {
         Toast.makeText(requireContext(), 
-                "Viewing all recent yoga sessions", 
+                "Viewing all yoga sessions", 
                 Toast.LENGTH_SHORT).show();
-        // TODO: Navigate to all sessions screen
+        navigateToYogaProgram();
     }
 }
