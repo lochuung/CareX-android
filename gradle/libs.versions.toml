@@ -23,6 +23,9 @@ firebaseAppcheckPlayintegrity = "18.0.0"
 credentials = "1.5.0"
 credentialsPlayServicesAuth = "1.5.0"
 googleid = "1.1.1"
+workmanager = "2.10.1"
+hiltWork = "1.2.0"
+firebaseCrashlyticsBuildtools = "3.0.3"
 
 [libraries]
 google-firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity" }
@@ -77,6 +80,13 @@ firebase-appcheck-playintegrity = { group = "com.google.firebase", name = "fireb
 credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+
+# WorkManager
+workmanager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
+workmanager-java = { module = "androidx.work:work-runtime", version.ref = "workmanager" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
+hilt-compiler-work = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltWork" }
+firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

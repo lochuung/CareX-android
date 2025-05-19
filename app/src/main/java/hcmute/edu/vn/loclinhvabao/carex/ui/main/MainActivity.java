@@ -1,8 +1,12 @@
 package hcmute.edu.vn.loclinhvabao.carex.ui.main;
 
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -23,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
     private NavController navController;
     private BottomNavigationView bottomNavigationView;
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 123;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,17 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Yêu cầu quyền thông báo
+                requestPermissions(
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
+                        REQUEST_NOTIFICATION_PERMISSION
+                );
+            }
+        }
     }
     
     private void setupNavigation() {
@@ -54,5 +71,22 @@ public class MainActivity extends AppCompatActivity {
         
         // Connect the navController with the BottomNavigationView
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+    }
+
+    // Xử lý kết quả
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Quyền được cấp, có thể hiển thị thông báo
+            } else {
+                // Quyền bị từ chối, hiển thị thông báo cho người dùng
+                Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show();
+                // Bạn có thể thêm logic để hướng dẫn người dùng đến cài đặt để bật quyền
+            }
+        }
     }
 }
