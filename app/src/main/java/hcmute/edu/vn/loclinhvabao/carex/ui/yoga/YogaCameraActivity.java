@@ -2,6 +2,7 @@ package hcmute.edu.vn.loclinhvabao.carex.ui.yoga;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -41,6 +42,19 @@ public class YogaCameraActivity extends AppCompatActivity
     private static final String TAG = "YogaCameraActivity";
     // Number of recognition results to show in the UI
     private static final int MAX_REPORT = 3;
+    
+    // Target pose tracking constants
+    private static final String TARGET_POSE = "cobra"; // Target pose to hold
+    private static final int TARGET_POSE_DURATION_SECONDS = 45; // How long user should hold the pose
+    private static final float POSE_CONFIDENCE_THRESHOLD = 0.5f; // Minimum confidence to count as in pose
+    
+    // Pose tracking variables
+    private long poseEnteredTimestamp = 0;
+    private long currentPoseHoldTime = 0;
+    private boolean isInTargetPose = false;
+    private boolean hasCompletedPoseChallenge = false;
+    private final Handler poseTrackingHandler = new Handler();
+    private Runnable poseTrackingRunnable;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -48,12 +62,16 @@ public class YogaCameraActivity extends AppCompatActivity
     private PreviewView viewFinder;
     private TextView textPrediction;
     private TextView textTimer;
+    private TextView textTargetPose;
+    private TextView textPoseProgress;
+    private ProgressBar poseProgressBar;
     private ImageButton cameraSwitchButton;
     private ImageButton buttonInstructions;
     private MaterialButton buttonToggleSession;
     private PoseOverlayView poseOverlayView;
     private CardView cardPrediction;
     private CardView cardTimer;
+    private CardView cardPoseChallenge;
     private ProgressBar timerProgress;
     
     // The classifier is created after initialization succeeded
@@ -110,9 +128,30 @@ public class YogaCameraActivity extends AppCompatActivity
         cardTimer = findViewById(R.id.card_timer);
         timerProgress = findViewById(R.id.timer_progress);
         
+        // Initialize pose challenge UI elements
+        cardPoseChallenge = findViewById(R.id.card_pose_challenge);
+        textTargetPose = findViewById(R.id.text_target_pose);
+        textPoseProgress = findViewById(R.id.text_pose_progress);
+        poseProgressBar = findViewById(R.id.pose_hold_progress);
+        
+        // Set up pose challenge UI
+        if (textTargetPose != null) {
+            textTargetPose.setText(TARGET_POSE);
+        }
+        if (textPoseProgress != null) {
+            textPoseProgress.setText(String.format(Locale.getDefault(), "0/%d sec", TARGET_POSE_DURATION_SECONDS));
+        }
+        if (poseProgressBar != null) {
+            poseProgressBar.setMax(TARGET_POSE_DURATION_SECONDS);
+            poseProgressBar.setProgress(0);
+        }
+        
         // Apply animations to UI elements for a smooth entrance
         UIAnimator.animateEntranceElements(viewFinder, cardTimer, cardPrediction, 
                 findViewById(R.id.button_panel));
+        
+        // Setup pose tracking runnable
+        setupPoseTracking();
     }
     
     /**
@@ -261,36 +300,42 @@ public class YogaCameraActivity extends AppCompatActivity
                 poseOverlayView,
                 cameraManager.isFrontCamera(),
                 (recognitions -> {
-                    // Update the UI with the recognition results
-                    recognitionPresenter.displayResults(recognitions,
-                            cameraManager.isFrontCamera());
-                    
-                    // Store current recognition information for instructions dialog
-                    if (recognitions != null && !recognitions.isEmpty()) {
-                        YogaPoseClassifier.Recognition topRecognition = recognitions.get(0);
-                        currentPoseName = topRecognition.title();
-                        currentConfidence = topRecognition.confidence();
+                    // Run on UI thread to avoid threading issues
+                    runOnUiThread(() -> {
+                        // Update the UI with the recognition results
+                        recognitionPresenter.displayResults(recognitions,
+                                cameraManager.isFrontCamera());
                         
-                        // Update confidence text view
-                        TextView confidenceTextView = findViewById(R.id.text_confidence);
-                        if (confidenceTextView != null) {
-                            confidenceTextView.setText(String.format(Locale.getDefault(), "%.0f%%", topRecognition.confidence() * 100));
-                        }
-                        
-                        // Show pose duration container if confidence is high enough
-                        View poseDurationContainer = findViewById(R.id.pose_duration_container);
-                        if (poseDurationContainer != null) {
-                            if (topRecognition.confidence() > 0.7f) {
-                                poseDurationContainer.setVisibility(View.VISIBLE);
-                                
-                                // Update progress bar using UIAnimator
-                                ProgressBar poseProgress = findViewById(R.id.pose_progress);
-                                UIAnimator.updateProgressWithConfidence(poseProgress, topRecognition.confidence(), cardPrediction);
-                            } else {
-                                poseDurationContainer.setVisibility(View.GONE);
+                        // Store current recognition information for instructions dialog
+                        if (recognitions != null && !recognitions.isEmpty()) {
+                            YogaPoseClassifier.Recognition topRecognition = recognitions.get(0);
+                            currentPoseName = topRecognition.title();
+                            currentConfidence = topRecognition.confidence();
+                            
+                            // Update confidence text view
+                            TextView confidenceTextView = findViewById(R.id.text_confidence);
+                            if (confidenceTextView != null) {
+                                confidenceTextView.setText(String.format(Locale.getDefault(), "%.0f%%", topRecognition.confidence() * 100));
+                            }
+                            
+                            // Track pose for target pose challenge
+                            handlePoseDetection(currentPoseName, currentConfidence);
+                            
+                            // Show pose duration container if confidence is high enough
+                            View poseDurationContainer = findViewById(R.id.pose_duration_container);
+                            if (poseDurationContainer != null) {
+                                if (topRecognition.confidence() > 0.7f) {
+                                    poseDurationContainer.setVisibility(View.VISIBLE);
+                                    
+                                    // Update progress bar using UIAnimator
+                                    ProgressBar poseProgress = findViewById(R.id.pose_progress);
+                                    UIAnimator.updateProgressWithConfidence(poseProgress, topRecognition.confidence(), cardPrediction);
+                                } else {
+                                    poseDurationContainer.setVisibility(View.GONE);
+                                }
                             }
                         }
-                    }
+                    });
                 })
         );
 
@@ -298,7 +343,139 @@ public class YogaCameraActivity extends AppCompatActivity
         cameraManager.bindCameraUseCases();
     }
     
-
+    /**
+     * Set up pose tracking functionality
+     */
+    private void setupPoseTracking() {
+        poseTrackingRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (isInTargetPose && !hasCompletedPoseChallenge) {
+                    // Calculate elapsed time
+                    long elapsedMillis = System.currentTimeMillis() - poseEnteredTimestamp;
+                    int elapsedSeconds = (int) (elapsedMillis / 1000);
+                    
+                    // Update progress
+                    currentPoseHoldTime = elapsedMillis;
+                    
+                    // Update UI
+                    runOnUiThread(() -> updatePoseProgress(elapsedSeconds));
+                    
+                    // Log for debugging
+                    Log.d(TAG, "Pose held for " + elapsedSeconds + " seconds");
+                    
+                    // Check if target reached
+                    if (elapsedSeconds >= TARGET_POSE_DURATION_SECONDS) {
+                        runOnUiThread(() -> onPoseChallengeCompleted());
+                    } else {
+                        // Continue tracking
+                        poseTrackingHandler.postDelayed(this, 100);
+                    }
+                }
+            }
+        };
+    }
+    
+    /**
+     * Update the pose progress UI
+     */
+    private void updatePoseProgress(int elapsedSeconds) {
+        if (textPoseProgress != null) {
+            textPoseProgress.setText(String.format(Locale.getDefault(), 
+                    "%d/%d sec", elapsedSeconds, TARGET_POSE_DURATION_SECONDS));
+        }
+        
+        if (poseProgressBar != null) {
+            poseProgressBar.setProgress(elapsedSeconds);
+        }
+    }
+    
+    /**
+     * Handle pose detection and tracking
+     */
+    private void handlePoseDetection(String poseName, float confidence) {
+        boolean isPoseDetected = poseName.equalsIgnoreCase(TARGET_POSE) && confidence >= POSE_CONFIDENCE_THRESHOLD;
+        
+        Log.d(TAG, String.format("Handling pose: %s (conf: %.2f) - Target: %s - In pose: %b - Completed: %b", 
+                poseName, confidence, TARGET_POSE, isInTargetPose, hasCompletedPoseChallenge));
+        
+        // If already completed, don't do anything
+        if (hasCompletedPoseChallenge) {
+            return;
+        }
+        
+        // Handle entering the pose
+        if (isPoseDetected && !isInTargetPose) {
+            isInTargetPose = true;
+            poseEnteredTimestamp = System.currentTimeMillis();
+            showToast("Started holding " + TARGET_POSE + " pose!");
+            Log.d(TAG, "ENTERED TARGET POSE: " + TARGET_POSE);
+            
+            // Make pose challenge card more prominent
+            if (cardPoseChallenge != null) {
+                UIAnimator.animateCardScale(cardPoseChallenge);
+            }
+            
+            // Start tracking
+            poseTrackingHandler.post(poseTrackingRunnable);
+        } 
+        // Handle exiting the pose before completion
+        else if (!isPoseDetected && isInTargetPose) {
+            isInTargetPose = false;
+            poseTrackingHandler.removeCallbacks(poseTrackingRunnable);
+            Log.d(TAG, "EXITED TARGET POSE: " + TARGET_POSE);
+            
+            // Reset progress if held for less than half the target time
+            int elapsedSeconds = (int) (currentPoseHoldTime / 1000);
+            if (elapsedSeconds < TARGET_POSE_DURATION_SECONDS / 2) {
+                updatePoseProgress(0);
+                showToast("Lost " + TARGET_POSE + " pose. Starting over!");
+            } else {
+                // Keep progress but pause timer
+                showToast("Paused at " + elapsedSeconds + " seconds. Return to the pose to continue!");
+            }
+        }
+        // Debug pose detection state
+        else if (isPoseDetected && isInTargetPose) {
+            // Already in pose and still detected - timer is running
+            Log.d(TAG, "HOLDING TARGET POSE: " + TARGET_POSE + " for " + (currentPoseHoldTime / 1000) + " seconds");
+        }
+    }
+    
+    /**
+     * Called when the user successfully completes the pose challenge
+     */
+    private void onPoseChallengeCompleted() {
+        hasCompletedPoseChallenge = true;
+        
+        // Update UI
+        if (textPoseProgress != null) {
+            textPoseProgress.setText("COMPLETED!");
+        }
+        
+        // Show celebration
+        showPoseChallengeCompletionDialog();
+        
+        // Vibrate to notify user
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            android.os.Vibrator vibrator = (android.os.Vibrator) getSystemService(android.content.Context.VIBRATOR_SERVICE);
+            if (vibrator != null && vibrator.hasVibrator()) {
+                vibrator.vibrate(android.os.VibrationEffect.createOneShot(500, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+            }
+        }
+    }
+    
+    /**
+     * Show completion dialog
+     */
+    private void showPoseChallengeCompletionDialog() {
+        new AlertDialog.Builder(this)
+            .setTitle("Challenge Complete!")
+            .setMessage("Congratulations! You held the " + TARGET_POSE + 
+                    " pose for " + TARGET_POSE_DURATION_SECONDS + " seconds.")
+            .setPositiveButton("Awesome!", null)
+            .show();
+    }
     
     /**
      * Show a toast message
@@ -313,6 +490,9 @@ public class YogaCameraActivity extends AppCompatActivity
         if (sessionManager != null) {
             sessionManager.onDestroy();
         }
+        
+        // Clean up pose tracking
+        poseTrackingHandler.removeCallbacks(poseTrackingRunnable);
         
         // Terminate all outstanding analyzing jobs (if there is any)
         executor.shutdown();
@@ -344,6 +524,11 @@ public class YogaCameraActivity extends AppCompatActivity
         if (sessionManager != null) {
             sessionManager.onResume();
         }
+        
+        // Resume pose tracking if needed
+        if (isInTargetPose && !hasCompletedPoseChallenge) {
+            poseTrackingHandler.post(poseTrackingRunnable);
+        }
     }
     
     @Override
@@ -354,6 +539,9 @@ public class YogaCameraActivity extends AppCompatActivity
         if (sessionManager != null) {
             sessionManager.onPause();
         }
+        
+        // Pause pose tracking
+        poseTrackingHandler.removeCallbacks(poseTrackingRunnable);
     }
 
 }
