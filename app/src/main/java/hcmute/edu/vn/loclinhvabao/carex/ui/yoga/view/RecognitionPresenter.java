@@ -15,23 +15,18 @@ import hcmute.edu.vn.loclinhvabao.carex.ml.YogaPoseClassifier;
  */
 public class RecognitionPresenter {
     private static final String TAG = "RecognitionPresenter";
-    
-    private final TextView textPrediction;
     private final PoseOverlayView poseOverlayView;
     private final YogaPoseClassifier classifier;
     
     /**
      * Creates a new instance of RecognitionPresenter.
      *
-     * @param textPrediction TextView for displaying prediction results
      * @param poseOverlayView View for displaying pose overlay
      * @param classifier YogaPoseClassifier to get detected person data
      */
     public RecognitionPresenter(
-            TextView textPrediction,
             PoseOverlayView poseOverlayView,
             YogaPoseClassifier classifier) {
-        this.textPrediction = textPrediction;
         this.poseOverlayView = poseOverlayView;
         this.classifier = classifier;
     }
@@ -44,28 +39,6 @@ public class RecognitionPresenter {
      */
     public void displayResults(List<YogaPoseClassifier.Recognition> recognitions, boolean isFrontCamera) {
         try {
-            // Early exit: if recognition is empty
-            if (recognitions.isEmpty()) {
-                textPrediction.setText("No pose detected");
-                textPrediction.setVisibility(View.VISIBLE);
-                return;
-            }
-
-            // Update the text and UI
-            StringBuilder text = new StringBuilder();
-            for (YogaPoseClassifier.Recognition recognition : recognitions) {
-                text.append(
-                        String.format(
-                                Locale.getDefault(),
-                                "%.2f %s\n",
-                                recognition.confidence(),
-                                recognition.title()));
-            }
-            textPrediction.setText(text);
-
-            // Make sure all UI elements are visible
-            textPrediction.setVisibility(View.VISIBLE);
-
             // Update pose overlay
             Person person = classifier.getLastDetectedPerson();
             if (person != null) {

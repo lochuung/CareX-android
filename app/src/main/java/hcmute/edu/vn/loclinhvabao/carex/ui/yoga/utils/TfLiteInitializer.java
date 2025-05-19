@@ -16,19 +16,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TfLiteInitializer {
     private static final String TAG = "TfLiteInitializer";
-    
+
     private final Context context;
     private Task<Void> initializeTask;
-    
+    private static volatile boolean isInitialized = false;
+
     public interface InitializationCallback {
         void onInitialized(boolean isGpuEnabled);
+
         void onInitializationFailed(Exception exception);
     }
-    
+
     public TfLiteInitializer(Context context) {
         this.context = context;
     }
-    
+
     /**
      * Initialize TensorFlow Lite with GPU support if available, falling back to CPU if not.
      */
@@ -38,14 +40,21 @@ public class TfLiteInitializer {
             attachCallbackToExistingTask(callback);
             return;
         }
-        
+        if (isInitialized) {
+            // Already initialized, call the callback immediately
+            if (callback != null) {
+                callback.onInitialized(false);
+            }
+            return;
+        }
+
         AtomicBoolean isGpuInitialized = new AtomicBoolean(false);
-        
+
         // Initialize TFLite asynchronously
         TfLiteInitializationOptions options = TfLiteInitializationOptions.builder()
                 .setEnableGpuDelegateSupport(true)
                 .build();
-        
+
         initializeTask = TfLite.initialize(context, options)
                 .continueWithTask(task -> {
                     if (task.isSuccessful()) {
@@ -60,10 +69,11 @@ public class TfLiteInitializer {
                     }
                 })
                 .addOnSuccessListener(unused -> {
-                    Log.d(TAG, "TFLite initialized successfully with " + 
-                          (isGpuInitialized.get() ? "GPU" : "CPU") + " support");
+                    Log.d(TAG, "TFLite initialized successfully with " +
+                            (isGpuInitialized.get() ? "GPU" : "CPU") + " support");
                     if (callback != null) {
                         callback.onInitialized(isGpuInitialized.get());
+                        isInitialized = true;
                     }
                 })
                 .addOnFailureListener(err -> {
@@ -73,20 +83,20 @@ public class TfLiteInitializer {
                     }
                 });
     }
-    
+
     /**
      * Attach a callback to an existing initialization task.
      */
     private void attachCallbackToExistingTask(InitializationCallback callback) {
         if (callback == null) return;
-        
+
         initializeTask.addOnSuccessListener(unused -> {
             // We don't know if GPU was enabled here since we're attaching to an existing task
             // The best we can do is to indicate success
             callback.onInitialized(false);
         }).addOnFailureListener(callback::onInitializationFailed);
     }
-    
+
     /**
      * Check if TFLite has been initialized.
      */

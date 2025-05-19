@@ -44,8 +44,8 @@ public class YogaCameraActivity extends AppCompatActivity
     private static final int MAX_REPORT = 3;
     
     // Target pose tracking constants
-    private static final String TARGET_POSE = "cobra"; // Target pose to hold
-    private static final int TARGET_POSE_DURATION_SECONDS = 45; // How long user should hold the pose
+    private static String TARGET_POSE = "cobra"; // Target pose to hold
+    private static int TARGET_POSE_DURATION_SECONDS = 45; // How long user should hold the pose
     private static final float POSE_CONFIDENCE_THRESHOLD = 0.5f; // Minimum confidence to count as in pose
     
     // Pose tracking variables
@@ -60,7 +60,6 @@ public class YogaCameraActivity extends AppCompatActivity
 
     // UI Components
     private PreviewView viewFinder;
-    private TextView textPrediction;
     private TextView textTimer;
     private TextView textTargetPose;
     private TextView textPoseProgress;
@@ -112,13 +111,39 @@ public class YogaCameraActivity extends AppCompatActivity
         // Check and request camera permission
         permissionHandler.requestCameraPermissionIfNeeded();
     }
+
+    @Override
+    protected void onDestroy() {
+        // Clean up session manager
+        if (sessionManager != null) {
+            sessionManager.onDestroy();
+        }
+
+        // Clean up pose tracking
+        poseTrackingHandler.removeCallbacks(poseTrackingRunnable);
+
+        // Terminate all outstanding analyzing jobs (if there is any)
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
+                Log.w(TAG, "Failed to terminate executor.");
+            }
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Exit was interrupted.", e);
+        }
+
+        // Release TFLite resources
+        if (yogaClassifier != null) {
+            yogaClassifier.close();
+        }
+        super.onDestroy();
+    }
     
     /**
      * Initialize UI components
      */
     private void initUI() {
         viewFinder = findViewById(R.id.view_finder);
-        textPrediction = findViewById(R.id.text_prediction);
         textTimer = findViewById(R.id.text_timer);
         cameraSwitchButton = findViewById(R.id.camera_switch_button);
         buttonInstructions = findViewById(R.id.button_instructions);
@@ -152,6 +177,9 @@ public class YogaCameraActivity extends AppCompatActivity
         
         // Setup pose tracking runnable
         setupPoseTracking();
+
+        TARGET_POSE = getIntent().getStringExtra("pose");
+        TARGET_POSE_DURATION_SECONDS = getIntent().getIntExtra("time", 45);
     }
     
     /**
@@ -286,7 +314,6 @@ public class YogaCameraActivity extends AppCompatActivity
     private void setupComponents() {
         // Create RecognitionPresenter
         recognitionPresenter = new RecognitionPresenter(
-                textPrediction,
                 poseOverlayView,
                 yogaClassifier);
 
@@ -311,12 +338,6 @@ public class YogaCameraActivity extends AppCompatActivity
                             YogaPoseClassifier.Recognition topRecognition = recognitions.get(0);
                             currentPoseName = topRecognition.title();
                             currentConfidence = topRecognition.confidence();
-                            
-                            // Update confidence text view
-                            TextView confidenceTextView = findViewById(R.id.text_confidence);
-                            if (confidenceTextView != null) {
-                                confidenceTextView.setText(String.format(Locale.getDefault(), "%.0f%%", topRecognition.confidence() * 100));
-                            }
                             
                             // Track pose for target pose challenge
                             handlePoseDetection(currentPoseName, currentConfidence);
@@ -482,33 +503,6 @@ public class YogaCameraActivity extends AppCompatActivity
      */
     private void showToast(String message) {
         android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onDestroy() {
-        // Clean up session manager
-        if (sessionManager != null) {
-            sessionManager.onDestroy();
-        }
-        
-        // Clean up pose tracking
-        poseTrackingHandler.removeCallbacks(poseTrackingRunnable);
-        
-        // Terminate all outstanding analyzing jobs (if there is any)
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
-                Log.w(TAG, "Failed to terminate executor.");
-            }
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Exit was interrupted.", e);
-        }
-
-        // Release TFLite resources
-        if (yogaClassifier != null) {
-            yogaClassifier.close();
-        }
-        super.onDestroy();
     }
 
     @Override
