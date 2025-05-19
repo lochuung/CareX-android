@@ -27,12 +27,12 @@
     <string name="power_yoga">Power Yoga</string>
     <string name="yin_yoga">Yin Yoga</string>
     <string name="yoga_categories">Yoga Styles</string>
-    <string name="featured_sessions">Featured Sessions</string>    
+    <string name="featured_sessions">Featured Sessions</string>
     <string name="morning_yoga">Morning Yoga</string>
     <string name="evening_wind_down">Evening Wind Down</string>
     <string name="start_session">Start Session</string>
     <string name="start_yoga_session">Start Yoga Session</string>
-    
+
     <!-- 10-Day Yoga Challenge -->
     <string name="yoga_challenge">10-Day Yoga Challenge</string>
     <string name="continue_to_day">Continue to Day %d</string>
@@ -120,4 +120,9 @@
     <string name="sound">Sound</string>
     <string name="vibration">Vibration</string>
     <string name="save_settings">Save Settings</string>
+
+    <!-- Camera Detect    -->
+    <string name="capture_button_alt">Capture</string>
+    <string name="switch_camera_button_alt">Switch Camera</string>
+    <string name="unknown">UNKNOWN</string>
 </resources>

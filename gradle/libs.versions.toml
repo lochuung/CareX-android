@@ -18,6 +18,9 @@ mpandroidchart = "v3.1.0"
 navigationFragment = "2.9.0"
 playServicesFitness = "21.2.0"
 playServicesLocation = "21.3.0"
+playServicesTfliteGpu = "16.4.0"
+playServicesTfliteJava = "16.4.0"
+playServicesTfliteSupport = "16.4.0"
 retrofit = "2.11.0"
 roomCompiler = "2.7.1"
 roomRuntime = "2.7.1"
@@ -61,6 +64,9 @@ navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "n
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesLocation" }
 play-services-fitness = { module = "com.google.android.gms:play-services-fitness", version.ref = "playServicesFitness" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+play-services-tflite-gpu = { module = "com.google.android.gms:play-services-tflite-gpu", version.ref = "playServicesTfliteGpu" }
+play-services-tflite-java = { module = "com.google.android.gms:play-services-tflite-java", version.ref = "playServicesTfliteJava" }
+play-services-tflite-support = { module = "com.google.android.gms:play-services-tflite-support", version.ref = "playServicesTfliteSupport" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 room-paging = { module = "androidx.room:room-paging", version.ref = "roomCompiler" }

@@ -35,8 +35,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -61,7 +61,7 @@ dependencies {
     // Navigation Component
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-    
+
     // Glide for image loading
     implementation(libs.glide)
     annotationProcessor(libs.glide.compiler)
@@ -82,7 +82,7 @@ dependencies {
     // Google Play Services
     implementation(libs.play.services.fitness)
     implementation(libs.play.services.auth)
-    
+
     // Firebase - sử dụng phiên bản BOM từ libs.versions.toml
     implementation(platform(libs.firebase.bom))
     implementation(libs.google.firebase.storage)
@@ -99,7 +99,7 @@ dependencies {
     implementation(libs.camerax.view)
     implementation(libs.camerax.extensions)    // MPAndroidChart for charts and graphs
     implementation(libs.mpandroidchart)
-    
+
     // YouTube Player
     implementation(libs.core)
 
@@ -118,5 +118,8 @@ dependencies {
     implementation(libs.concurrent.futures)
     implementation(libs.guava)
 
-
+    // tensorflow lite
+    implementation(libs.play.services.tflite.gpu)
+    implementation(libs.play.services.tflite.java)
+    implementation(libs.play.services.tflite.support)
 }
