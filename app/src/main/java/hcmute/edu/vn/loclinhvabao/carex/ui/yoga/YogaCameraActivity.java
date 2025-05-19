@@ -62,7 +62,7 @@ public class YogaCameraActivity extends AppCompatActivity
     // Core components 
     private CameraManager cameraManager;
     private RecognitionPresenter recognitionPresenter;
-    private YogaAnalyzer classificationAnalyzer;
+    private YogaAnalyzer analyzer;
     
     // Refactored helper components
     private PermissionHandler permissionHandler;
@@ -256,7 +256,7 @@ public class YogaCameraActivity extends AppCompatActivity
                 this,
                 viewFinder);
 
-        classificationAnalyzer = new YogaAnalyzer(
+        analyzer = new YogaAnalyzer(
                 yogaClassifier,
                 poseOverlayView,
                 cameraManager.isFrontCamera(),
@@ -294,7 +294,7 @@ public class YogaCameraActivity extends AppCompatActivity
                 })
         );
 
-        cameraManager.setAnalyzer(classificationAnalyzer);
+        cameraManager.setAnalyzer(analyzer);
         cameraManager.bindCameraUseCases();
     }
     
