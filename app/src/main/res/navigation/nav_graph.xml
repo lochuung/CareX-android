@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/trainingFragment">
+    app:startDestination="@id/homeFragment">
 
+    <!-- Original fragments -->
     <fragment
         android:id="@+id/trainingFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.training.TrainingFragment"
@@ -28,4 +29,39 @@
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+
+    <!-- Yoga app fragments -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.yoga.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_exerciseDetailFragment"
+            app:destination="@id/exerciseDetailFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/exerciseDetailFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.yoga.ExerciseDetailFragment"
+        android:label="fragment_exercise_detail"
+        tools:layout="@layout/fragment_exercise_detail">
+        <action
+            android:id="@+id/action_exerciseDetailFragment_to_lessonStartFragment"
+            app:destination="@id/lessonStartFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lessonStartFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.yoga.LessonStartFragment"
+        android:label="fragment_lesson_start"
+        tools:layout="@layout/fragment_lesson_start" />
 </navigation>

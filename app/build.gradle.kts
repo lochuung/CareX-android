@@ -96,9 +96,10 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.video)
     implementation(libs.camerax.view)
-    implementation(libs.camerax.extensions)
-
-    // MPAndroidChart for charts and graphs
+    implementation(libs.camerax.extensions)    // MPAndroidChart for charts and graphs
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    
+    // YouTube Player
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
 
 }
