@@ -20,7 +20,7 @@ import hcmute.edu.vn.loclinhvabao.carex.R;
 
 @AndroidEntryPoint
 public class TrainingFragment extends Fragment {    private CardView cardYoga, cardMeditation, cardHatha, cardVinyasa, cardPower;
-    private MaterialButton btnStartWorkout, btnStartYogaSession;
+    private MaterialButton btnStartYogaSession;
     private CardView cardRecentWorkout1, cardRecentWorkout2;
     private TextView tvViewAll;@Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -41,9 +41,7 @@ public class TrainingFragment extends Fragment {    private CardView cardYoga, c
         cardMeditation = view.findViewById(R.id.card_meditation);
         cardHatha = view.findViewById(R.id.card_hatha);
         cardVinyasa = view.findViewById(R.id.card_vinyasa);
-        cardPower = view.findViewById(R.id.card_power);
-          // Initialize workout start buttons
-        btnStartWorkout = view.findViewById(R.id.btn_start_workout);
+        cardPower = view.findViewById(R.id.card_power);        // Initialize workout start button
         btnStartYogaSession = view.findViewById(R.id.btn_start_yoga_session);
         
         // Initialize recent workout cards
@@ -62,9 +60,7 @@ public class TrainingFragment extends Fragment {    private CardView cardYoga, c
         cardMeditation.setOnClickListener(v -> showYogaSessionDetails(R.string.meditation));
         cardHatha.setOnClickListener(v -> showYogaSessionDetails(R.string.hatha_yoga));
         cardVinyasa.setOnClickListener(v -> showYogaSessionDetails(R.string.vinyasa_flow));
-        cardPower.setOnClickListener(v -> showYogaSessionDetails(R.string.power_yoga));
-          // Set click listener for start workout buttons
-        btnStartWorkout.setOnClickListener(v -> startYogaSession());
+        cardPower.setOnClickListener(v -> showYogaSessionDetails(R.string.power_yoga));        // Set click listener for start yoga session button
         btnStartYogaSession.setOnClickListener(v -> navigateToYogaProgram());
         
         // Set click listeners for recent workout cards
