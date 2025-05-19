@@ -19,14 +19,16 @@
     <color name="textPrimary">#212121</color>
     <color name="textSecondary">#757575</color>
     <color name="textHint">#9E9E9E</color>
-    
-    <!-- Workout Category Colors -->
-    <color name="runningColor">#4CAF50</color>
+      <!-- Workout Category Colors -->    <color name="runningColor">#4CAF50</color>
     <color name="yogaColor">#5E35B1</color>
     <color name="gymColor">#F44336</color>
     <color name="cyclingColor">#2196F3</color>
     <color name="swimmingColor">#00BCD4</color>
-
+    
+    <!-- Dividers -->
+    <color name="dividerColor">#E0E0E0</color>
+    
+    <!-- Additional Colors from master branch -->
     <color name="purple_500">#9C27B0</color>
     <color name="teal_200">#03DAC5</color>
     <color name="orange_500">#FF9800</color>

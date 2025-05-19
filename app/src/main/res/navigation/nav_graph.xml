@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/trainingFragment">
+    app:startDestination="@id/homeFragment">
 
+    <!-- Original fragments -->
     <fragment
         android:id="@+id/trainingFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.training.TrainingFragment"
@@ -22,7 +23,6 @@
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ReportFragment"
         android:label="fragment_report"
         tools:layout="@layout/fragment_report">
-
         <action
             android:id="@+id/action_reportFragment_to_progressFragment"
             app:destination="@id/progressFragment"
@@ -30,7 +30,6 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
-
         <action
             android:id="@+id/action_reportFragment_to_profileFragment"
             app:destination="@id/profileFragment"
@@ -46,6 +45,41 @@
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
 
+    <!-- Yoga app fragments -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.yoga.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_exerciseDetailFragment"
+            app:destination="@id/exerciseDetailFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/exerciseDetailFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.yoga.ExerciseDetailFragment"
+        android:label="fragment_exercise_detail"
+        tools:layout="@layout/fragment_exercise_detail">
+        <action
+            android:id="@+id/action_exerciseDetailFragment_to_lessonStartFragment"
+            app:destination="@id/lessonStartFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lessonStartFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.yoga.LessonStartFragment"
+        android:label="fragment_lesson_start"
+        tools:layout="@layout/fragment_lesson_start" />
+    
     <!-- Sub-destinations for Report section -->
     <fragment
         android:id="@+id/progressFragment"
@@ -67,7 +101,6 @@
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.SessionDetailFragment"
         android:label="fragment_session_detail"
         tools:layout="@layout/fragment_session_detail">
-
         <argument
             android:name="sessionId"
             app:argType="string" />
@@ -78,7 +111,6 @@
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile">
-
         <action
             android:id="@+id/action_profileFragment_to_reminderSettingsFragment"
             app:destination="@id/reminderSettingsFragment"
@@ -94,3 +126,4 @@
         android:label="fragment_reminder_settings"
         tools:layout="@layout/fragment_reminder_settings" />
 </navigation>
+
