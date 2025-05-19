@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.firebase.crashlytics.buildtools)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -101,5 +102,21 @@ dependencies {
     
     // YouTube Player
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+
+    // Gson
+    implementation("com.google.code.gson:gson:2.13.1")
+
+    // WorkManager
+    implementation(libs.workmanager.java)
+    implementation(libs.workmanager.ktx)
+
+    // Hilt với WorkManager
+    implementation(libs.hilt.work)
+    annotationProcessor(libs.hilt.compiler.work)
+
+    implementation("androidx.lifecycle:lifecycle-livedata:2.9.0")
+    implementation("androidx.concurrent:concurrent-futures:1.1.0")
+    implementation("com.google.guava:guava:31.1-android")
+
 
 }

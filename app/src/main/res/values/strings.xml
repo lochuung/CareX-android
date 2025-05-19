@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">CareX</string>
+
     <!-- Navigation -->
     <string name="training">Training</string>
     <string name="discover">Discover</string>
     <string name="report">Report</string>
     <string name="settings">Settings</string>
-    
+
     <!-- Training Fragment -->
     <string name="workout_title">Today\'s Yoga Session</string>
     <string name="calories_burned">Calories Burned</string>
@@ -19,7 +20,7 @@
     <string name="gym">Gym</string>
     <string name="cycling">Cycling</string>
     <string name="swimming">Swimming</string>
-    
+
     <!-- Yoga Categories -->
     <string name="yoga_subtitle">Find your inner balance</string>
     <string name="meditation">Meditation</string>

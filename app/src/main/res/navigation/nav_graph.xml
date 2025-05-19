@@ -86,6 +86,7 @@
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ProgressFragment"
         android:label="fragment_progress"
         tools:layout="@layout/fragment_progress">
+
         <action
             android:id="@+id/action_progressFragment_to_sessionDetailFragment"
             app:destination="@id/sessionDetailFragment"
@@ -125,3 +126,4 @@
         android:label="fragment_reminder_settings"
         tools:layout="@layout/fragment_reminder_settings" />
 </navigation>
+
