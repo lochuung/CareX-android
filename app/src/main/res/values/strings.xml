@@ -28,7 +28,8 @@
     <string name="power_yoga">Power Yoga</string>
     <string name="yin_yoga">Yin Yoga</string>
     <string name="yoga_categories">Yoga Styles</string>
-    <string name="featured_sessions">Featured Sessions</string>    <string name="morning_yoga">Morning Yoga</string>
+    <string name="featured_sessions">Featured Sessions</string>    
+    <string name="morning_yoga">Morning Yoga</string>
     <string name="evening_wind_down">Evening Wind Down</string>
     <string name="start_session">Start Session</string>
     
@@ -40,4 +41,83 @@
     <string name="start_pose">Start Pose</string>
     <string name="skip">Skip</string>
     <string name="hold_pose">Hold the pose</string>
+
+    <!-- Report Fragment -->
+    <string name="statistics">Statistics</string>
+    <string name="track_your_progress">Track your yoga journey</string>
+    <string name="total_sessions">Total Sessions</string>
+    <string name="total_minutes">Total Minutes</string>
+    <string name="weekly_progress">Weekly Progress</string>
+    <string name="view_details">View Details</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="achievements">Achievements</string>
+    <string name="consistent">Consistent</string>
+    <string name="expert_level">Expert Level</string>
+    <string name="calorie_burner">Calorie Burner</string>
+
+    <!-- Progress Fragment -->
+    <string name="progress_detail">Progress Detail</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="year">Year</string>
+    <string name="all_time">All Time</string>
+    <string name="progress_summary">Progress Summary</string>
+    <string name="avg_sessions_per_week">Average sessions per week</string>
+    <string name="avg_duration_per_session">Average duration per session</string>
+    <string name="avg_calories_per_session">Average calories per session</string>
+    <string name="favorite_yoga_style">Favorite yoga style</string>
+    <string name="most_consistent_day">Most consistent day</string>
+    <string name="yoga_style_distribution">Yoga Style Distribution</string>
+    <string name="session_history">Session History</string>
+
+    <!-- Session Detail Fragment -->
+    <string name="session_detail">Session Detail</string>
+    <string name="duration">Duration</string>
+    <string name="calories">Calories</string>
+    <string name="poses">Poses</string>
+    <string name="session_score">Session Score</string>
+    <string name="excellent">Excellent</string>
+    <string name="good">Good</string>
+    <string name="average">Average</string>
+    <string name="need_improvement">Needs Improvement</string>
+    <string name="poses_performed">Poses Performed</string>
+    <string name="notes">Notes</string>
+    <string name="share_results">Share Results</string>
+
+    <!-- Profile Fragment -->
+    <string name="profile">Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="intermediate_level">Intermediate Level</string>
+    <string name="current_streak">14 Day Streak</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="height">Height</string>
+    <string name="weight">Weight</string>
+    <string name="bmi">BMI</string>
+    <string name="age">Age</string>
+    <string name="yoga_goal">Yoga Goal</string>
+    <string name="flexibility">Flexibility &amp; Balance</string>
+    <string name="reminder_settings">Reminder Settings</string>
+    <string name="reminder_notifications">Reminder Notifications</string>
+    <string name="reminder_time">Reminder Time</string>
+    <string name="reminder_days">Reminder Days</string>
+    <string name="app_settings">App Settings</string>
+    <string name="theme">Theme</string>
+    <string name="system_default">System Default</string>
+    <string name="language">Language</string>
+    <string name="about">About</string>
+    <string name="sign_out">Sign Out</string>
+
+    <!-- Reminder Settings Fragment -->
+    <string name="enable_reminders">Enable Reminders</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="notification_preferences">Notification Preferences</string>
+    <string name="sound">Sound</string>
+    <string name="vibration">Vibration</string>
+    <string name="save_settings">Save Settings</string>
 </resources>
