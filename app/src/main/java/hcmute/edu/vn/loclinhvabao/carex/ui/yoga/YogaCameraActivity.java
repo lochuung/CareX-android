@@ -1,19 +1,19 @@
 package hcmute.edu.vn.loclinhvabao.carex.ui.yoga;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.view.PreviewView;
 import androidx.cardview.widget.CardView;
-
-import com.google.android.material.button.MaterialButton;
 
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -25,7 +25,6 @@ import hcmute.edu.vn.loclinhvabao.carex.R;
 import hcmute.edu.vn.loclinhvabao.carex.ml.YogaPoseClassifier;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.camera.CameraManager;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.camera.YogaAnalyzer;
-import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.session.YogaSessionManager;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.utils.PermissionHandler;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.utils.TfLiteInitializer;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.utils.UIAnimator;
@@ -36,7 +35,6 @@ import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.view.RecognitionPresenter;
 @AndroidEntryPoint
 public class YogaCameraActivity extends AppCompatActivity 
         implements PermissionHandler.PermissionCallback, 
-                   YogaSessionManager.SessionStateListener,
                    TfLiteInitializer.InitializationCallback {
 
     private static final String TAG = "YogaCameraActivity";
@@ -66,7 +64,6 @@ public class YogaCameraActivity extends AppCompatActivity
     private ProgressBar poseProgressBar;
     private ImageButton cameraSwitchButton;
     private ImageButton buttonInstructions;
-    private MaterialButton buttonToggleSession;
     private PoseOverlayView poseOverlayView;
     private CardView cardPrediction;
     private CardView cardTimer;
@@ -83,7 +80,6 @@ public class YogaCameraActivity extends AppCompatActivity
     
     // Refactored helper components
     private PermissionHandler permissionHandler;
-    private YogaSessionManager sessionManager;
     private TfLiteInitializer tfLiteInitializer;
     private YogaPoseDialogHelper dialogHelper;
     
@@ -114,11 +110,6 @@ public class YogaCameraActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        // Clean up session manager
-        if (sessionManager != null) {
-            sessionManager.onDestroy();
-        }
-
         // Clean up pose tracking
         poseTrackingHandler.removeCallbacks(poseTrackingRunnable);
 
@@ -147,7 +138,6 @@ public class YogaCameraActivity extends AppCompatActivity
         textTimer = findViewById(R.id.text_timer);
         cameraSwitchButton = findViewById(R.id.camera_switch_button);
         buttonInstructions = findViewById(R.id.button_instructions);
-        buttonToggleSession = findViewById(R.id.button_toggle_session);
         poseOverlayView = findViewById(R.id.pose_overlay);
         cardPrediction = findViewById(R.id.card_prediction);
         cardTimer = findViewById(R.id.card_timer);
@@ -159,9 +149,19 @@ public class YogaCameraActivity extends AppCompatActivity
         textPoseProgress = findViewById(R.id.text_pose_progress);
         poseProgressBar = findViewById(R.id.pose_hold_progress);
         
-        // Set up pose challenge UI
+        // Make sure the pose challenge card is visible
+        if (cardPoseChallenge != null) {
+            cardPoseChallenge.setVisibility(View.VISIBLE);
+        }
+        
+        // Get the target pose and duration from intent first
+        TARGET_POSE = getIntent().getStringExtra("pose") != null ? 
+                      getIntent().getStringExtra("pose") : TARGET_POSE;
+        TARGET_POSE_DURATION_SECONDS = getIntent().getIntExtra("time", 45);
+        
+        // Set up pose challenge UI with correct values
         if (textTargetPose != null) {
-            textTargetPose.setText(TARGET_POSE);
+            textTargetPose.setText(TARGET_POSE.toUpperCase());
         }
         if (textPoseProgress != null) {
             textPoseProgress.setText(String.format(Locale.getDefault(), "0/%d sec", TARGET_POSE_DURATION_SECONDS));
@@ -171,15 +171,25 @@ public class YogaCameraActivity extends AppCompatActivity
             poseProgressBar.setProgress(0);
         }
         
+        // Find and set up the pose status text
+        TextView textPoseStatus = findViewById(R.id.text_pose_status);
+        if (textPoseStatus != null) {
+            textPoseStatus.setText("WAITING");
+            textPoseStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
+        }
+        
+        // Make sure completion icon is hidden initially
+        ImageView imageCompletion = findViewById(R.id.image_completion);
+        if (imageCompletion != null) {
+            imageCompletion.setVisibility(View.GONE);
+        }
+        
         // Apply animations to UI elements for a smooth entrance
         UIAnimator.animateEntranceElements(viewFinder, cardTimer, cardPrediction, 
                 findViewById(R.id.button_panel));
         
         // Setup pose tracking runnable
         setupPoseTracking();
-
-        TARGET_POSE = getIntent().getStringExtra("pose");
-        TARGET_POSE_DURATION_SECONDS = getIntent().getIntExtra("time", 45);
     }
     
     /**
@@ -188,15 +198,6 @@ public class YogaCameraActivity extends AppCompatActivity
     private void initHelpers() {
         // Initialize permission handler
         permissionHandler = new PermissionHandler(this, this);
-        
-        // Initialize session manager
-        sessionManager = new YogaSessionManager(
-                this, 
-                textTimer, 
-                timerProgress, 
-                buttonToggleSession, 
-                cardTimer,
-                this);
         
         // Initialize TFLite initializer
         tfLiteInitializer = new TfLiteInitializer(this);
@@ -211,19 +212,7 @@ public class YogaCameraActivity extends AppCompatActivity
     private void setupEventListeners() {
         // Set up back button
         ImageButton btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> {
-            // If session is active, show confirmation dialog
-            if (sessionManager.isSessionActive()) {
-                new AlertDialog.Builder(this)
-                    .setTitle("End Session")
-                    .setMessage("Do you want to end your current yoga session?")
-                    .setPositiveButton("Yes", (dialog, which) -> finish())
-                    .setNegativeButton("No", null)
-                    .show();
-            } else {
-                finish();
-            }
-        });
+        btnBack.setOnClickListener(v -> finish());
 
         // Set up camera switch button
         cameraSwitchButton.setOnClickListener(v -> {
@@ -297,16 +286,6 @@ public class YogaCameraActivity extends AppCompatActivity
         // Cannot continue without camera permission
         finish();
     }
-    
-    /**
-     * Called when yoga session state changes
-     */
-    @Override
-    public void onSessionStateChanged(boolean isActive) {
-        Log.d(TAG, "Session state changed: " + (isActive ? "active" : "inactive"));
-        // Update UI based on session state if needed
-        buttonToggleSession.setEnabled(true);
-    }
 
     /**
      * Set up the refactored components after classifier initialization.
@@ -331,30 +310,38 @@ public class YogaCameraActivity extends AppCompatActivity
                     runOnUiThread(() -> {
                         // Update the UI with the recognition results
                         recognitionPresenter.displayResults(recognitions,
-                                cameraManager.isFrontCamera());
-                        
-                        // Store current recognition information for instructions dialog
-                        if (recognitions != null && !recognitions.isEmpty()) {
-                            YogaPoseClassifier.Recognition topRecognition = recognitions.get(0);
-                            currentPoseName = topRecognition.title();
-                            currentConfidence = topRecognition.confidence();
-                            
-                            // Track pose for target pose challenge
-                            handlePoseDetection(currentPoseName, currentConfidence);
-                            
-                            // Show pose duration container if confidence is high enough
-                            View poseDurationContainer = findViewById(R.id.pose_duration_container);
-                            if (poseDurationContainer != null) {
-                                if (topRecognition.confidence() > 0.7f) {
+                                cameraManager.isFrontCamera());                            // Store current recognition information for instructions dialog
+                            if (recognitions != null && !recognitions.isEmpty()) {
+                                YogaPoseClassifier.Recognition topRecognition = recognitions.get(0);
+                                currentPoseName = topRecognition.title();
+                                currentConfidence = topRecognition.confidence();
+                                
+                                // Track pose for target pose challenge
+                                handlePoseDetection(currentPoseName, currentConfidence);
+                                
+                                // Show pose duration container if confidence is high enough
+                                View poseDurationContainer = findViewById(R.id.pose_duration_container);
+                                if (poseDurationContainer != null) {
+                                    // Show detected pose name and confidence
+                                    TextView textDetectedPose = findViewById(R.id.text_detected_pose);
+                                    TextView textPoseConfidence = findViewById(R.id.text_pose_confidence);
+                                    
+                                    if (textDetectedPose != null) {
+                                        textDetectedPose.setText(currentPoseName.toUpperCase());
+                                    }
+                                    
+                                    if (textPoseConfidence != null) {
+                                        int confidencePercent = (int)(currentConfidence * 100);
+                                        textPoseConfidence.setText(confidencePercent + "%");
+                                    }
+                                    
+                                    // Always show the pose detection container
                                     poseDurationContainer.setVisibility(View.VISIBLE);
                                     
                                     // Update progress bar using UIAnimator
                                     ProgressBar poseProgress = findViewById(R.id.pose_progress);
                                     UIAnimator.updateProgressWithConfidence(poseProgress, topRecognition.confidence(), cardPrediction);
-                                } else {
-                                    poseDurationContainer.setVisibility(View.GONE);
                                 }
-                            }
                         }
                     });
                 })
@@ -403,7 +390,7 @@ public class YogaCameraActivity extends AppCompatActivity
     private void updatePoseProgress(int elapsedSeconds) {
         if (textPoseProgress != null) {
             textPoseProgress.setText(String.format(Locale.getDefault(), 
-                    "%d/%d sec", elapsedSeconds, TARGET_POSE_DURATION_SECONDS));
+                    "%d/%ds", elapsedSeconds, TARGET_POSE_DURATION_SECONDS));
         }
         
         if (poseProgressBar != null) {
@@ -420,9 +407,40 @@ public class YogaCameraActivity extends AppCompatActivity
         Log.d(TAG, String.format("Handling pose: %s (conf: %.2f) - Target: %s - In pose: %b - Completed: %b", 
                 poseName, confidence, TARGET_POSE, isInTargetPose, hasCompletedPoseChallenge));
         
+        // Update the status text based on current state
+        TextView textPoseStatus = findViewById(R.id.text_pose_status);
+        
         // If already completed, don't do anything
         if (hasCompletedPoseChallenge) {
+            if (textPoseStatus != null) {
+                textPoseStatus.setText("COMPLETED");
+                textPoseStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                textPoseStatus.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light) & 0x33FFFFFF);
+            }
             return;
+        }
+        
+        // Update confidence display for all poses (even non-target poses)
+        if (confidence > 0) {
+            // Continuously update UI to show the current pose confidence
+            if (poseName.equalsIgnoreCase(TARGET_POSE)) {
+                if (textPoseStatus != null) {
+                    int confidencePercent = (int)(confidence * 100);
+                    if (confidence >= POSE_CONFIDENCE_THRESHOLD) {
+                        textPoseStatus.setText("HOLDING - " + confidencePercent + "%");
+                        textPoseStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                        textPoseStatus.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light) & 0x33FFFFFF);
+                    } else {
+                        textPoseStatus.setText("ALMOST - " + confidencePercent + "%");
+                        textPoseStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
+                        textPoseStatus.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light) & 0x33FFFFFF);
+                    }
+                }
+            } else if (textPoseStatus != null) {
+                textPoseStatus.setText("WRONG POSE");
+                textPoseStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                textPoseStatus.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light) & 0x33FFFFFF);
+            }
         }
         
         // Handle entering the pose
@@ -446,6 +464,13 @@ public class YogaCameraActivity extends AppCompatActivity
             poseTrackingHandler.removeCallbacks(poseTrackingRunnable);
             Log.d(TAG, "EXITED TARGET POSE: " + TARGET_POSE);
             
+            // Update status text
+            if (textPoseStatus != null) {
+                textPoseStatus.setText("PAUSED");
+                textPoseStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
+                textPoseStatus.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light) & 0x33FFFFFF);
+            }
+            
             // Reset progress if held for less than half the target time
             int elapsedSeconds = (int) (currentPoseHoldTime / 1000);
             if (elapsedSeconds < TARGET_POSE_DURATION_SECONDS / 2) {
@@ -457,7 +482,7 @@ public class YogaCameraActivity extends AppCompatActivity
             }
         }
         // Debug pose detection state
-        else if (isPoseDetected && isInTargetPose) {
+        else if (isPoseDetected) {
             // Already in pose and still detected - timer is running
             Log.d(TAG, "HOLDING TARGET POSE: " + TARGET_POSE + " for " + (currentPoseHoldTime / 1000) + " seconds");
         }
@@ -466,12 +491,35 @@ public class YogaCameraActivity extends AppCompatActivity
     /**
      * Called when the user successfully completes the pose challenge
      */
+    @SuppressLint("SetTextI18s")
     private void onPoseChallengeCompleted() {
         hasCompletedPoseChallenge = true;
         
         // Update UI
         if (textPoseProgress != null) {
-            textPoseProgress.setText("COMPLETED!");
+            textPoseProgress.setText("DONE!");
+            textPoseProgress.setTextColor(getResources().getColor(android.R.color.white));
+        }
+        
+        // Update status
+        TextView textPoseStatus = findViewById(R.id.text_pose_status);
+        if (textPoseStatus != null) {
+            textPoseStatus.setText("COMPLETED");
+            textPoseStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            textPoseStatus.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light) & 0x33FFFFFF);
+        }
+        
+        // Show completion icon
+        ImageView imageCompletion = findViewById(R.id.image_completion);
+        if (imageCompletion != null) {
+            imageCompletion.setVisibility(View.VISIBLE);
+            
+            // Add a small animation to make the icon more noticeable
+            imageCompletion.setAlpha(0f);
+            imageCompletion.animate()
+                .alpha(1f)
+                .setDuration(500)
+                .start();
         }
         
         // Show celebration
@@ -492,9 +540,8 @@ public class YogaCameraActivity extends AppCompatActivity
     private void showPoseChallengeCompletionDialog() {
         new AlertDialog.Builder(this)
             .setTitle("Challenge Complete!")
-            .setMessage("Congratulations! You held the " + TARGET_POSE + 
-                    " pose for " + TARGET_POSE_DURATION_SECONDS + " seconds.")
-            .setPositiveButton("Awesome!", null)
+            .setMessage("Great job holding " + TARGET_POSE.toUpperCase() + " pose for " + TARGET_POSE_DURATION_SECONDS + "s!")
+            .setPositiveButton("Continue", null)
             .show();
     }
     
@@ -514,11 +561,6 @@ public class YogaCameraActivity extends AppCompatActivity
             permissionHandler.requestCameraPermissionIfNeeded();
         }
         
-        // Resume session manager if needed
-        if (sessionManager != null) {
-            sessionManager.onResume();
-        }
-        
         // Resume pose tracking if needed
         if (isInTargetPose && !hasCompletedPoseChallenge) {
             poseTrackingHandler.post(poseTrackingRunnable);
@@ -528,11 +570,6 @@ public class YogaCameraActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        
-        // Pause session manager if needed
-        if (sessionManager != null) {
-            sessionManager.onPause();
-        }
         
         // Pause pose tracking
         poseTrackingHandler.removeCallbacks(poseTrackingRunnable);
