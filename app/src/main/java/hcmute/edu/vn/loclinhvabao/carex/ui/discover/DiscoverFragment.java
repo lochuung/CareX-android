@@ -32,7 +32,7 @@ public class DiscoverFragment extends Fragment {
 
         Intent intent = new Intent(getActivity(), YogaCameraActivity.class);
         intent.putExtra("time", 45);
-        intent.putExtra("pose", "cabra");
+        intent.putExtra("pose", "shoudler_stand");
         startActivity(intent);
     }
 }

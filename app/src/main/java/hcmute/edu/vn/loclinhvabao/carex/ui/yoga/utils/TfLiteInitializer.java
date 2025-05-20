@@ -89,6 +89,7 @@ public class TfLiteInitializer {
      */
     private void attachCallbackToExistingTask(InitializationCallback callback) {
         if (callback == null) return;
+        if (initializeTask == null) return;
 
         initializeTask.addOnSuccessListener(unused -> {
             // We don't know if GPU was enabled here since we're attaching to an existing task

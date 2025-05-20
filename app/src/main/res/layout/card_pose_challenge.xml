@@ -2,66 +2,91 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_pose_challenge"
-    android:layout_width="match_parent"
+    android:id="@+id/card_pose_challenge"    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="6dp"
-    app:cardBackgroundColor="#F5F5FF"
-    app:contentPadding="16dp">
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#1A1A1A"
+    android:alpha="0.95"
+    app:contentPadding="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
+        android:orientation="vertical">        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="POSE CHALLENGE"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:textColor="#3F51B5"
-            android:gravity="center" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"            android:text="POSE CHALLENGE"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:letterSpacing="0.1"
+                android:textColor="#3F51B5" />
+
+            <ImageView
+                android:id="@+id/image_completion"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_menu_send"
+                android:tint="#4CAF50"
+                android:visibility="gone"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:id="@+id/text_pose_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WAITING"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#FF9800"
+                android:background="#22FF9800"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="8dp"
+            android:background="@drawable/yoga_card_gradient_background"            android:padding="12dp"
+            android:gravity="center_vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hold the pose:"
-                android:textSize="16sp" />
+                android:text="Target:"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF" />
 
             <TextView
                 android:id="@+id/text_target_pose"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="dog"
+                android:layout_weight="1"                android:text="dog"
                 android:textAllCaps="true"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="4dp"
+                android:gravity="start" />
+                
+            <TextView
+                android:id="@+id/text_pose_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0/45s"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#E91E63"
-                android:gravity="end" />
-
+                android:textColor="#FFFFFF" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/text_pose_progress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="0/45 sec"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#4CAF50"
-            android:gravity="center"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="8dp" />
 
         <ProgressBar
             android:id="@+id/pose_hold_progress"
@@ -69,7 +94,9 @@
             android:layout_width="match_parent"
             android:layout_height="8dp"
             android:progressTint="#4CAF50"
+            android:progressBackgroundTint="#22FFFFFF"
             android:max="45"
+            android:layout_marginTop="4dp"
             android:progress="0" />
 
     </LinearLayout>
