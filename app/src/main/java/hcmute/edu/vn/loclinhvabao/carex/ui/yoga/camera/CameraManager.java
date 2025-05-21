@@ -32,6 +32,7 @@ public class CameraManager {
     private final LifecycleOwner lifecycleOwner;
     private final PreviewView previewView;
     private final ExecutorService executor;
+    private ProcessCameraProvider cameraProvider;
 
     @Getter
     private CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
@@ -62,6 +63,15 @@ public class CameraManager {
         bindCameraUseCases();
     }
 
+    /**
+     * Stop and release the camera resources
+     */
+    public void stopCamera() {
+        if (cameraProvider != null) {
+            Log.d(TAG, "Unbinding all camera use cases");
+            cameraProvider.unbindAll();
+        }
+    }
 
     /**
      * Declare and bind preview and analysis use cases
@@ -75,7 +85,6 @@ public class CameraManager {
                     cameraProviderFuture.addListener(
                             () -> {
                                 // Camera provider is now guaranteed to be available
-                                ProcessCameraProvider cameraProvider;
                                 try {
                                     cameraProvider = cameraProviderFuture.get();
                                 } catch (ExecutionException | InterruptedException e) {

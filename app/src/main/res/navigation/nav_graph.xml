@@ -5,7 +5,8 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/trainingFragment">
 
-    <!-- Original fragments -->    <fragment
+    <!-- Original fragments -->
+    <fragment
         android:id="@+id/trainingFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.training.TrainingFragment"
         android:label="fragment_training"
@@ -23,7 +24,15 @@
         android:id="@+id/discoverFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.discover.DiscoverFragment"
         android:label="fragment_discover"
-        tools:layout="@layout/fragment_discover" />
+        tools:layout="@layout/fragment_discover">
+        <action
+            android:id="@+id/action_discoverFragment_to_yogaCameraFragment"
+            app:destination="@id/yogaCameraFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/reportFragment"
@@ -86,7 +95,7 @@
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.yoga.LessonStartFragment"
         android:label="fragment_lesson_start"
         tools:layout="@layout/fragment_lesson_start" />
-    
+
     <!-- Sub-destinations for Report section -->
     <fragment
         android:id="@+id/progressFragment"
@@ -132,5 +141,20 @@
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ReminderSettingsFragment"
         android:label="fragment_reminder_settings"
         tools:layout="@layout/fragment_reminder_settings" />
-</navigation>
 
+    <fragment
+        android:id="@+id/yogaCameraFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.yoga.YogaCameraFragment"
+        android:label="fragment_yoga_camera"
+        tools:layout="@layout/fragment_yoga_camera">
+        <argument
+            android:name="pose"
+            android:defaultValue="cobra"
+            app:argType="string" />
+
+        <argument
+            android:name="time"
+            android:defaultValue="45"
+            app:argType="integer" />
+    </fragment>
+</navigation>
