@@ -518,7 +518,6 @@ public class YogaCameraFragment extends Fragment
     /**
      * Called when the user successfully completes the pose challenge
      */
-    @RequiresApi(api = Build.VERSION_CODES.S)
     @SuppressLint("SetTextI18s")
     private void onPoseChallengeCompleted() {
         hasCompletedPoseChallenge = true;
