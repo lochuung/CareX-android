@@ -1,4 +1,4 @@
-package hcmute.edu.vn.loclinhvabao.carex.ui.main;
+package hcmute.edu.vn.loclinhvabao.carex.ui;
 
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -13,7 +13,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -80,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideBottomNavigationView() {
+        if (bottomNavigationView == null || navController == null) {
+            return;
+        }
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             for (int id : SHOW_BOTTOM_NAVIGATION_IDS) {
                 if (destination.getId() == id) {

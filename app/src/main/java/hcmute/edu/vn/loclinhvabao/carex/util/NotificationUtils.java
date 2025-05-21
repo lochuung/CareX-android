@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import hcmute.edu.vn.loclinhvabao.carex.R;
-import hcmute.edu.vn.loclinhvabao.carex.ui.main.MainActivity;
+import hcmute.edu.vn.loclinhvabao.carex.ui.MainActivity;
 import hcmute.edu.vn.loclinhvabao.carex.worker.YogaReminderWorker;
 
 public class NotificationUtils {
