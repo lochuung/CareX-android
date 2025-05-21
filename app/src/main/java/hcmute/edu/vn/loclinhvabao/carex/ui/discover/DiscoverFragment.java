@@ -28,7 +28,7 @@ public class DiscoverFragment extends Fragment {
         // Navigate to YogaCameraFragment using SafeArgs
         DiscoverFragmentDirections.ActionDiscoverFragmentToYogaCameraFragment action =
                 DiscoverFragmentDirections.actionDiscoverFragmentToYogaCameraFragment()
-                        .setPose("shoulder_stand")
+                        .setPose("cobra")
                         .setTime(45);
 
         Navigation.findNavController(view).navigate(action);

@@ -8,23 +8,24 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import hcmute.edu.vn.loclinhvabao.carex.constant.PoseConstants;
-import hcmute.edu.vn.loclinhvabao.carex.data.local.model.pose_detect.Person;
 import hcmute.edu.vn.loclinhvabao.carex.ml.YogaPoseClassifier;
-import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.view.PoseOverlayView;
+import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.observer.PoseRecognitionObserver;
 import hcmute.edu.vn.loclinhvabao.carex.util.ImageUtils;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Image analyzer for yoga pose detection
+ * Uses PoseRecognitionObserver pattern for callback instead of lambda
+ */
 public class YogaAnalyzer implements ImageAnalysis.Analyzer {
-    private static final String TAG = "ClassificationAnalyzer";
+    private static final String TAG = "YogaAnalyzer";
 
     private final YogaPoseClassifier classifier;
-    private final PoseOverlayView overlayView;
+    private final PoseRecognitionObserver observer;
     private boolean isFrontCamera;
-    private final Consumer<List<YogaPoseClassifier.Recognition>> onResult;
 
     @Getter
     private Bitmap bitmapBuffer;
@@ -35,14 +36,19 @@ public class YogaAnalyzer implements ImageAnalysis.Analyzer {
     @Getter
     private boolean pauseAnalysis = false;
 
+    /**
+     * Creates a new YogaAnalyzer
+     * 
+     * @param classifier The classifier instance for yoga pose detection
+     * @param isFrontCamera Whether front camera is being used
+     * @param observer The observer to receive pose recognition events
+     */
     public YogaAnalyzer(YogaPoseClassifier classifier,
-                        PoseOverlayView overlayView,
-                        boolean isFrontCamera,
-                        Consumer<List<YogaPoseClassifier.Recognition>> onResult) {
+                       boolean isFrontCamera,
+                       PoseRecognitionObserver observer) {
         this.classifier = classifier;
-        this.overlayView = overlayView;
         this.isFrontCamera = isFrontCamera;
-        this.onResult = onResult;
+        this.observer = observer;
     }
 
     public boolean isFrontCamera() {
@@ -86,14 +92,12 @@ public class YogaAnalyzer implements ImageAnalysis.Analyzer {
                     processedBitmap.recycle();
                 }
                 processedBitmap = rotatedBitmap;
-            }
-
-            // Resize bitmap to the input size expected by the TensorFlow model
+            }            // Resize bitmap to the input size expected by the TensorFlow model
             Bitmap resizedBitmap = ImageUtils.resize(
                     processedBitmap,
                     PoseConstants.INPUT_SIZE,
                     PoseConstants.INPUT_SIZE);
-
+                    
             // Perform the yoga pose classification for the current frame
             List<YogaPoseClassifier.Recognition> recognitions = classifier.classifyPose(resizedBitmap);
 
@@ -105,16 +109,12 @@ public class YogaAnalyzer implements ImageAnalysis.Analyzer {
                 resizedBitmap.recycle();
             }
 
-            onResult.accept(recognitions);
-
-            Person person = classifier.getLastDetectedPerson();
-            if (person != null) {
-                overlayView.setKeyPoints(person.getKeyPoints());
+            // Notify observer of recognition results
+            if (observer != null) {
+                observer.onPoseRecognized(recognitions);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error analyzing image", e);
         }
     }
-
-
 }
