@@ -5,8 +5,13 @@ plugins {
 }
 
 buildscript {
+    repositories {
+        google()
+    }
+
     dependencies {
         classpath(libs.hilt.android.gradle.plugin)
         classpath(libs.lombok)
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.9.0")
     }
 }
