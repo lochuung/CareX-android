@@ -92,15 +92,24 @@ public class DailyProgressRepository {
                 dailyProgressDao.getDailyProgressBetweenDates(userId, startDate, endDate),
                 DailyProgressMapper::entityListToModelList
         );
-    }
-
-    /**
+    }    /**
      * Get the total duration of all yoga sessions for a user (in seconds)
      * @param userId The user's ID
      * @return The total duration in seconds
      */
     public int getTotalDurationForUser(String userId) {
-        return dailyProgressDao.getTotalDurationForUser(userId);
+        int[] duration = new int[1];
+        Thread thread = new Thread(() -> {
+            duration[0] = dailyProgressDao.getTotalDurationForUser(userId);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return duration[0];
     }
 
     /**
@@ -109,7 +118,18 @@ public class DailyProgressRepository {
      * @return The total calories burned
      */
     public int getTotalCaloriesForUser(String userId) {
-        return dailyProgressDao.getTotalCaloriesForUser(userId);
+        int[] calories = new int[1];
+        Thread thread = new Thread(() -> {
+            calories[0] = dailyProgressDao.getTotalCaloriesForUser(userId);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return calories[0];
     }
 
     /**
@@ -118,16 +138,36 @@ public class DailyProgressRepository {
      * @return The total number of sessions
      */
     public int getTotalSessionsForUser(String userId) {
-        return dailyProgressDao.getTotalSessionsForUser(userId);
-    }
-
-    /**
+        int[] sessions = new int[1];
+        Thread thread = new Thread(() -> {
+            sessions[0] = dailyProgressDao.getTotalSessionsForUser(userId);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return sessions[0];
+    }    /**
      * Get the average score across all yoga sessions for a user
      * @param userId The user's ID
      * @return The average score
      */
     public float getAverageScoreForUser(String userId) {
-        return dailyProgressDao.getAverageScoreForUser(userId);
+        float[] score = new float[1];
+        Thread thread = new Thread(() -> {
+            score[0] = dailyProgressDao.getAverageScoreForUser(userId);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return score[0];
     }
 
     /**
@@ -136,8 +176,18 @@ public class DailyProgressRepository {
      * @return The latest DailyProgressEntity
      */
     public DailyProgress getLatestDailyProgress(String userId) {
-        DailyProgressEntity entity = dailyProgressDao.getLatestDailyProgress(userId);
-        return DailyProgressMapper.entityToModel(entity);
+        final DailyProgressEntity[] entity = new DailyProgressEntity[1];
+        Thread thread = new Thread(() -> {
+            entity[0] = dailyProgressDao.getLatestDailyProgress(userId);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return DailyProgressMapper.entityToModel(entity[0]);
     }
 
     /**
@@ -146,6 +196,17 @@ public class DailyProgressRepository {
      * @return The count of unique practice days
      */
     public int getUniquePracticeDaysCount(String userId) {
-        return dailyProgressDao.getUniquePracticeDaysCount(userId);
+        int[] count = new int[1];
+        Thread thread = new Thread(() -> {
+            count[0] = dailyProgressDao.getUniquePracticeDaysCount(userId);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return count[0];
     }
 }

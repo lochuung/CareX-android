@@ -24,10 +24,11 @@ public interface YogaPoseDao {
     void updatePose(YogaPoseEntity pose);
 
     @Delete
-    void deletePose(YogaPoseEntity pose);
-
-    @Query("SELECT * FROM yoga_poses WHERE id = :poseId")
+    void deletePose(YogaPoseEntity pose);    @Query("SELECT * FROM yoga_poses WHERE id = :poseId")
     LiveData<YogaPoseEntity> getPoseById(int poseId);
+    
+    @Query("SELECT * FROM yoga_poses WHERE id = :poseId")
+    YogaPoseEntity getPoseByIdSync(int poseId);
     
     @Query("SELECT * FROM yoga_poses ORDER BY id")
     LiveData<List<YogaPoseEntity>> getAllPoses();

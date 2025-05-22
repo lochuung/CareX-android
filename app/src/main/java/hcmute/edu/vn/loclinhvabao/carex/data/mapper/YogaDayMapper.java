@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.dao.YogaPoseDao;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.entity.YogaDayEntity;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.entity.YogaPoseEntity;
+import hcmute.edu.vn.loclinhvabao.carex.data.repository.YogaPoseRepository;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.models.YogaDay;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.models.YogaPose;
 
@@ -16,13 +17,13 @@ import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.models.YogaPose;
  */
 public class YogaDayMapper {
     private final YogaPoseDao yogaPoseDao;
+    private final YogaPoseRepository yogaPoseRepository;
 
     @Inject
-    public YogaDayMapper(YogaPoseDao yogaPoseDao) {
+    public YogaDayMapper(YogaPoseDao yogaPoseDao, YogaPoseRepository yogaPoseRepository) {
         this.yogaPoseDao = yogaPoseDao;
-    }
-
-    /**
+        this.yogaPoseRepository = yogaPoseRepository;
+    }    /**
      * Convert YogaDayEntity to YogaDay
      * This is more complex because we need to load the poses from their IDs
      */
@@ -32,17 +33,8 @@ public class YogaDayMapper {
         // Parse pose IDs from JSON
         List<Integer> poseIds = YogaPoseMapper.parsePoseIdsFromJson(entity.getPosesJson());
         
-        // Load all poses - in a real app this would be done asynchronously
-        // This is a simplification for demonstration purposes
-        List<YogaPose> poses = new ArrayList<>();
-        for (Integer poseId : poseIds) {
-            // This synchronous approach is for demonstration only
-            // In a real app, you would use LiveData and observe the result
-            YogaPoseEntity poseEntity = yogaPoseDao.getPoseById(poseId).getValue();
-            if (poseEntity != null) {
-                poses.add(YogaPoseMapper.entityToModel(poseEntity));
-            }
-        }
+        // Load all poses from background thread
+        List<YogaPose> poses = loadPosesFromIds(poseIds);
         
         return new YogaDay(
             entity.getDayNumber(),
@@ -50,6 +42,35 @@ public class YogaDayMapper {
             entity.getDescription(),
             poses
         );
+    }
+    
+    /**
+     * Load pose models from a list of pose IDs using background thread
+     */
+    private List<YogaPose> loadPosesFromIds(List<Integer> poseIds) {
+        final List<YogaPose> poses = new ArrayList<>();
+        
+        if (poseIds == null || poseIds.isEmpty()) {
+            return poses;
+        }
+        
+        // Create a thread to load the poses synchronously from the database
+        Thread thread = new Thread(() -> {
+            List<YogaPoseEntity> poseEntities = yogaPoseRepository.getPoseEntitiesByIdsSync(poseIds);
+            for (YogaPoseEntity entity : poseEntities) {
+                poses.add(YogaPoseMapper.entityToModel(entity));
+            }
+        });
+        
+        // Start the thread and wait for it to complete
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        return poses;
     }
     
     /**

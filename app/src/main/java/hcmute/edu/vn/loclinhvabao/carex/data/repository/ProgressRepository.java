@@ -102,15 +102,24 @@ public class ProgressRepository {
                 progressDao.getCompletedProgressForUser(userId),
                 progressMapper::entityListToModelList
         );
-    }
-
-    /**
+    }    /**
      * Get the count of completed days for a user
      * @param userId The user's ID
      * @return The count of completed days
      */
     public int getCompletedDaysCount(String userId) {
-        return progressDao.getCompletedDaysCount(userId);
+        int[] count = new int[1];
+        Thread thread = new Thread(() -> {
+            count[0] = progressDao.getCompletedDaysCount(userId);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return count[0];
     }
 
     /**
@@ -121,7 +130,18 @@ public class ProgressRepository {
      * @return The count of completed days in the specified time range
      */
     public int getCompletedDaysInTimeRange(String userId, long startTime, long endTime) {
-        return progressDao.getCompletedDaysInTimeRange(userId, startTime, endTime);
+        int[] count = new int[1];
+        Thread thread = new Thread(() -> {
+            count[0] = progressDao.getCompletedDaysInTimeRange(userId, startTime, endTime);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return count[0];
     }
 
     /**
@@ -132,7 +152,18 @@ public class ProgressRepository {
      * @return The total calories burned in the specified time range
      */
     public int getTotalCaloriesInTimeRange(String userId, long startTime, long endTime) {
-        return progressDao.getTotalCaloriesInTimeRange(userId, startTime, endTime);
+        int[] calories = new int[1];
+        Thread thread = new Thread(() -> {
+            calories[0] = progressDao.getTotalCaloriesInTimeRange(userId, startTime, endTime);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return calories[0];
     }
 
     /**
@@ -141,6 +172,17 @@ public class ProgressRepository {
      * @return The average confidence score
      */
     public float getAverageConfidence(String userId) {
-        return progressDao.getAverageConfidence(userId);
+        float[] confidence = new float[1];
+        Thread thread = new Thread(() -> {
+            confidence[0] = progressDao.getAverageConfidence(userId);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return confidence[0];
     }
 }

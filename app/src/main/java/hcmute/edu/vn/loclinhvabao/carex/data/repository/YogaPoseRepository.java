@@ -3,6 +3,7 @@ package hcmute.edu.vn.loclinhvabao.carex.data.repository;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -107,9 +108,7 @@ public class YogaPoseRepository {
                 yogaPoseDao.getPosesByDifficulty(difficulty),
                 YogaPoseMapper::entityListToModelList
         );
-    }
-
-    /**
+    }    /**
      * Search for yoga poses by name
      * @param query The search query
      * @return A LiveData object containing a list of matching YogaPose objects
@@ -120,5 +119,33 @@ public class YogaPoseRepository {
                 yogaPoseDao.searchPoses(searchQuery),
                 YogaPoseMapper::entityListToModelList
         );
+    }
+      /**
+     * Get a pose entity by ID synchronously (should be called from background thread)
+     * @param poseId The ID of the pose
+     * @return The YogaPoseEntity object or null if not found
+     */
+    public YogaPoseEntity getPoseEntityByIdSync(int poseId) {
+        return yogaPoseDao.getPoseByIdSync(poseId);
+    }
+    
+    /**
+     * Get a list of pose entities by their IDs synchronously (should be called from background thread)
+     * @param poseIds List of pose IDs to fetch
+     * @return List of YogaPoseEntity objects for the given IDs
+     */
+    public List<YogaPoseEntity> getPoseEntitiesByIdsSync(List<Integer> poseIds) {
+        List<YogaPoseEntity> results = new ArrayList<>();
+        if (poseIds == null || poseIds.isEmpty()) {
+            return results;
+        }
+        
+        for (Integer poseId : poseIds) {
+            YogaPoseEntity entity = yogaPoseDao.getPoseByIdSync(poseId);
+            if (entity != null) {
+                results.add(entity);
+            }
+        }
+        return results;
     }
 }
