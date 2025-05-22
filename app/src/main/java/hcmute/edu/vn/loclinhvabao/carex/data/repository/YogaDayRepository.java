@@ -4,6 +4,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -130,7 +134,7 @@ public class YogaDayRepository {
      */
     public int getDaysCount() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<Integer> future = executor.submit(() -> yogaDayDao.getDaysCount());
+        Future<Integer> future = executor.submit(yogaDayDao::getDaysCount);
         try {
             return future.get(); // Waits for the result
         } catch (InterruptedException | ExecutionException e) {
