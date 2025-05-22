@@ -129,17 +129,15 @@ public class YogaDayRepository {
      * @return The count of days in the yoga program
      */
     public int getDaysCount() {
-        int[] count = new int[1];
-        Thread thread = new Thread(() -> {
-            count[0] = yogaDayDao.getDaysCount();
-        });
-        thread.start();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<Integer> future = executor.submit(() -> yogaDayDao.getDaysCount());
         try {
-            thread.join();
-        } catch (InterruptedException e) {
+            return future.get(); // Waits for the result
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return 0;
+        } finally {
+            executor.shutdown();
         }
-        return count[0];
     }
 }
