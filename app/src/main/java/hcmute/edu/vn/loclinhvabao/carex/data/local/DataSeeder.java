@@ -17,6 +17,9 @@ import hcmute.edu.vn.loclinhvabao.carex.data.local.dao.YogaDayDao;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.dao.YogaPoseDao;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.entity.YogaDayEntity;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.entity.YogaPoseEntity;
+import hcmute.edu.vn.loclinhvabao.carex.data.repository.UserProfileRepository;
+import hcmute.edu.vn.loclinhvabao.carex.util.Constants;
+import hcmute.edu.vn.loclinhvabao.carex.util.Constants;
 
 /**
  * This class seeds the database with initial data for yoga poses and program days.
@@ -25,14 +28,15 @@ import hcmute.edu.vn.loclinhvabao.carex.data.local.entity.YogaPoseEntity;
 @Singleton
 public class DataSeeder {
     private final YogaPoseDao yogaPoseDao;
-    private final YogaDayDao yogaDayDao;
+    private final YogaDayDao yogaDayDao;    private final UserProfileRepository userProfileRepository;
     private final Executor executor;
     private final Gson gson;
 
     @Inject
-    public DataSeeder(YogaPoseDao yogaPoseDao, YogaDayDao yogaDayDao) {
+    public DataSeeder(YogaPoseDao yogaPoseDao, YogaDayDao yogaDayDao, UserProfileRepository userProfileRepository) {
         this.yogaPoseDao = yogaPoseDao;
         this.yogaDayDao = yogaDayDao;
+        this.userProfileRepository = userProfileRepository;
         this.executor = Executors.newSingleThreadExecutor();
         this.gson = new Gson();
     }
@@ -42,6 +46,9 @@ public class DataSeeder {
      */
     public void seedDatabaseIfNeeded() {
         executor.execute(() -> {
+            // Create a default user profile first to avoid foreign key constraint issues
+            createDefaultUserProfile();
+            
             if (yogaPoseDao.getPosesCount() == 0) {
                 // Database is empty, seed it
                 List<YogaPoseEntity> poses = createInitialPoses();
@@ -54,6 +61,12 @@ public class DataSeeder {
                 }
             }
         });
+    }
+      /**
+     * Create a default user profile to satisfy foreign key constraints
+     */
+    private void createDefaultUserProfile() {
+        userProfileRepository.createDefaultProfile(Constants.DEFAULT_USER_ID, Constants.DEFAULT_USER_NAME);
     }
 
     /**

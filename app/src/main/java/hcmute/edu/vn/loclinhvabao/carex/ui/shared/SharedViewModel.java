@@ -20,6 +20,7 @@ import hcmute.edu.vn.loclinhvabao.carex.data.repository.DailyProgressRepository;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.ProgressRepository;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.YogaDayRepository;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.YogaPoseRepository;
+import hcmute.edu.vn.loclinhvabao.carex.util.Constants;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.models.YogaDay;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.models.YogaPose;
 
@@ -28,11 +29,10 @@ public class SharedViewModel extends ViewModel {
     
     private final YogaDayRepository yogaDayRepository;
     private final YogaPoseRepository yogaPoseRepository;
-    private final ProgressRepository progressRepository;
-    private final DailyProgressRepository dailyProgressRepository;
+    private final ProgressRepository progressRepository;    private final DailyProgressRepository dailyProgressRepository;
     
     // Current user ID - in a real app this would come from authentication
-    private final String currentUserId = "current_user";
+    private final String currentUserId = Constants.CURRENT_USER_ID;
     
     // LiveData for yoga days (10-day program)
     private final MediatorLiveData<List<YogaDay>> yogaDays = new MediatorLiveData<>();

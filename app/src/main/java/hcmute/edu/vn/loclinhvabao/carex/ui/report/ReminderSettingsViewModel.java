@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.model.UserProfile;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.UserProfileRepository;
+import hcmute.edu.vn.loclinhvabao.carex.util.Constants;
 
 @HiltViewModel
 public class ReminderSettingsViewModel extends ViewModel {
@@ -23,17 +24,16 @@ public class ReminderSettingsViewModel extends ViewModel {
     private final MutableLiveData<List<String>> reminderDays = new MutableLiveData<>(
             Arrays.asList("MONDAY", "WEDNESDAY", "FRIDAY"));
 
-    private final MutableLiveData<Boolean> soundEnabled = new MutableLiveData<>(true);
-    private final MutableLiveData<Boolean> vibrationEnabled = new MutableLiveData<>(true);
+    private final MutableLiveData<Boolean> soundEnabled = new MutableLiveData<>(true);    private final MutableLiveData<Boolean> vibrationEnabled = new MutableLiveData<>(true);
 
-    private final MutableLiveData<String> userId = new MutableLiveData<>("current_user");
+    private final MutableLiveData<String> userId = new MutableLiveData<>(Constants.CURRENT_USER_ID);
 
     @Inject
     public ReminderSettingsViewModel(UserProfileRepository userProfileRepository) {
         this.userProfileRepository = userProfileRepository;
 
         // Load current settings
-        loadSettings("current_user");
+        loadSettings(Constants.CURRENT_USER_ID);
     }
 
     public LiveData<Boolean> getReminderEnabled() {

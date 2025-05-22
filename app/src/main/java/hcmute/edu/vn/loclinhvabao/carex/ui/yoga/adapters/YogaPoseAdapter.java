@@ -58,18 +58,30 @@ public class YogaPoseAdapter extends ListAdapter<YogaPose, YogaPoseAdapter.YogaP
             tvPoseName = itemView.findViewById(R.id.tv_pose_name);
             tvPoseSanskritName = itemView.findViewById(R.id.tv_pose_sanskrit_name);
             tvDuration = itemView.findViewById(R.id.tv_duration);
-        }
-
-        public void bind(YogaPose pose, OnPoseClickListener listener) {
+        }        public void bind(YogaPose pose, OnPoseClickListener listener) {
             tvPoseName.setText(pose.getEnglishName());
             tvPoseSanskritName.setText(pose.getSanskritName());
             tvDuration.setText(pose.getFormattedDuration());
             
-            // Load image with Glide
-            Glide.with(itemView.getContext())
-                    .load(pose.getImageUrl())
-                    .placeholder(R.drawable.yoga_session_background)
-                    .into(ivPose);
+            // Load image with our improved image utility
+            // Uses transformations to maintain rounded corners throughout the loading process
+            hcmute.edu.vn.loclinhvabao.carex.utils.ImageUtils.loadRoundedImage(
+                    itemView.getContext(),
+                    pose.getImageUrl(),
+                    ivPose,
+                    12, // 12dp corner radius matches CardView radius
+                    new hcmute.edu.vn.loclinhvabao.carex.utils.ImageUtils.OnImageLoadListener() {
+                        @Override
+                        public void onLoadSuccess() {
+                            // Animation could be added here if desired
+                        }
+                        
+                        @Override
+                        public void onLoadFailed() {
+                            // Handle load failures if needed
+                        }
+                    }
+            );
             
             // Set click listener
             cardPose.setOnClickListener(v -> listener.onPoseClick(pose));

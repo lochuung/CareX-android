@@ -55,7 +55,7 @@ public class YogaCameraFragment extends Fragment
 
     // UI Components
     private YogaCameraUiBinder ui;
-    
+
     // Pose tracker
     private PoseTracker poseTracker;
 
@@ -107,7 +107,9 @@ public class YogaCameraFragment extends Fragment
         // Check and request camera permission
         permissionHandler.requestCameraPermissionIfNeeded();
         return root;
-    }    @SuppressLint({"SetTextI18s", "SetTextI18n"})
+    }
+
+    @SuppressLint({"SetTextI18s", "SetTextI18n"})
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -120,13 +122,15 @@ public class YogaCameraFragment extends Fragment
             ui.textPoseConfidence.setText((int) (state.getConfidence() * 100) + "%");
             ui.textPoseProgress.setText(state.getProgressSeconds() + "/" + TARGET_POSE_DURATION_SECONDS + "s");
             ui.poseProgressBar.setProgress(state.getProgressSeconds());
-            
+
             // Show completion dialog if completed
             if (state.isCompleted()) {
                 showPoseChallengeCompletionDialog();
             }
         });
-    }@Override
+    }
+
+    @Override
     public void onDestroyView() {
         // Clean up pose tracking
         if (poseTracker != null) {
@@ -148,13 +152,15 @@ public class YogaCameraFragment extends Fragment
             yogaClassifier.close();
         }
         super.onDestroyView();
-    }/**
+    }
+
+    /**
      * Initialize UI components
      */
     private void initUI() {
         // Initialize UI binder with the root view
         ui = new YogaCameraUiBinder(root);
-        
+
         // Set initial visibility states
         ui.setInitialVisibility();
 
@@ -202,14 +208,17 @@ public class YogaCameraFragment extends Fragment
 
         // Initialize dialog helper
         dialogHelper = new YogaPoseDialogHelper(requireContext());
-    }    /**
+    }
+
+    /**
      * Set up UI event listeners
      */
     private void setupEventListeners() {
         // Set up back button
         ui.btnBack.setOnClickListener(v -> NavHostFragment
                 .findNavController(this)
-                .navigateUp());
+                .popBackStack()
+        );
 
         // Set up camera switch button
         ui.cameraSwitchButton.setOnClickListener(v -> {
@@ -312,15 +321,15 @@ public class YogaCameraFragment extends Fragment
 
         // Define what happens after pose recognition
         // Run on UI thread to avoid threading issues
-        recognitionPresenter.setPostRecognitionCallback(recognitions -> 
-            requireActivity().runOnUiThread(() -> processRecognitionResults(recognitions))
+        recognitionPresenter.setPostRecognitionCallback(recognitions ->
+                requireActivity().runOnUiThread(() -> processRecognitionResults(recognitions))
         );
 
         // Connect analyzer to camera manager
         cameraManager.setAnalyzer(analyzer);
         cameraManager.bindCameraUseCases();
     }
-    
+
     /**
      * Process recognition results from the pose analyzer
      */
@@ -330,7 +339,7 @@ public class YogaCameraFragment extends Fragment
         if (recognitions == null || recognitions.isEmpty()) {
             return;
         }
-        
+
         // Get top recognition
         YogaPoseClassifier.Recognition topRecognition = recognitions.get(0);
         currentPoseName = topRecognition.title();
@@ -362,9 +371,9 @@ public class YogaCameraFragment extends Fragment
 
             // Update progress bar using UIAnimator
             UIAnimator.updateProgressWithConfidence(
-                ui.poseProgress, 
-                topRecognition.confidence(), 
-                ui.cardPrediction
+                    ui.poseProgress,
+                    topRecognition.confidence(),
+                    ui.cardPrediction
             );
         }
     }
@@ -381,14 +390,15 @@ public class YogaCameraFragment extends Fragment
         if (ui.poseProgressBar != null) {
             ui.poseProgressBar.setProgress(elapsedSeconds);
         }
-        
+
         // Update the ViewModel
         viewModel.updateProgress(elapsedSeconds);
     }
 
     /**
      * Called when the user successfully completes the pose challenge
-     */    @SuppressLint({"SetTextI18s", "SetTextI18n"})
+     */
+    @SuppressLint({"SetTextI18s", "SetTextI18n"})
     private void onPoseChallengeCompleted() {
         // Update ViewModel
         viewModel.markCompleted();
@@ -449,7 +459,9 @@ public class YogaCameraFragment extends Fragment
      */
     private void showToast(String message) {
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show();
-    }    @Override
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -530,8 +542,8 @@ public class YogaCameraFragment extends Fragment
 
     /**
      * Update the pose confidence display based on current detection
-     * 
-     * @param poseName The detected pose name
+     *
+     * @param poseName   The detected pose name
      * @param confidence The confidence level
      */
     @SuppressLint("SetTextI18n")
@@ -557,7 +569,7 @@ public class YogaCameraFragment extends Fragment
             ui.textPoseStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
             ui.textPoseStatus.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light) & 0x33FFFFFF);
         }
-        
+
         // If the pose challenge is completed, always show "COMPLETED"
         if (poseTracker.isCompleted()) {
             ui.textPoseStatus.setText("COMPLETED");
