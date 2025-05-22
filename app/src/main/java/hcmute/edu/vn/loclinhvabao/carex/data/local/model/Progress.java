@@ -30,9 +30,15 @@ public class Progress {
     /**
      * Get the completion date formatted as a string
      */
-    public String getFormattedCompletionDate() {
+    /**
+     * Get the completion date formatted as a string
+     * 
+     * @param context The context to use for date formatting
+     * @return A formatted date string or "Not completed" if the date is null
+     */
+    public String getFormattedCompletionDate(android.content.Context context) {
         if (completionDate == null) return "Not completed";
-        return android.text.format.DateFormat.getDateFormat(null).format(completionDate);
+        return android.text.format.DateFormat.getDateFormat(context).format(completionDate);
     }
     
     /**
