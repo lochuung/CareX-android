@@ -49,30 +49,30 @@ public class PoseOverlayView extends View {
     static {
         // Define connections based on KEYPOINT_EDGE_INDS_TO_COLOR
         // 👤 Face connections
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.NOSE, BodyPart.LEFT_EYE), Color.RED);        // 🔴
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.NOSE, BodyPart.RIGHT_EYE), Color.RED);       // 🔵
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_EYE, BodyPart.LEFT_EAR), Color.RED);        // 🔴
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_EYE, BodyPart.RIGHT_EAR), Color.RED);    // 🔵
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.NOSE, BodyPart.LEFT_EYE), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.NOSE, BodyPart.RIGHT_EYE), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_EYE, BodyPart.LEFT_EAR), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_EYE, BodyPart.RIGHT_EAR), Color.RED);
 
         // 🫁 Shoulders & Torso
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.NOSE, BodyPart.LEFT_SHOULDER), Color.RED);     // 🔴
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.NOSE, BodyPart.RIGHT_SHOULDER), Color.RED);    // 🔵
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_SHOULDER, BodyPart.RIGHT_SHOULDER), Color.RED); // 🟢
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_SHOULDER, BodyPart.LEFT_HIP), Color.RED);  // 🔴
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_SHOULDER, BodyPart.RIGHT_HIP), Color.RED);// 🔵
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_HIP, BodyPart.RIGHT_HIP), Color.RED);    // 🟢
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.NOSE, BodyPart.LEFT_SHOULDER), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.NOSE, BodyPart.RIGHT_SHOULDER), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_SHOULDER, BodyPart.RIGHT_SHOULDER), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_SHOULDER, BodyPart.LEFT_HIP), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_SHOULDER, BodyPart.RIGHT_HIP), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_HIP, BodyPart.RIGHT_HIP), Color.RED);
 
         // 💪 Arms
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_SHOULDER, BodyPart.LEFT_ELBOW), Color.RED);     // 🔴
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_ELBOW, BodyPart.LEFT_WRIST), Color.RED);      // 🔴
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_SHOULDER, BodyPart.RIGHT_ELBOW), Color.RED);  // 🔵
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_ELBOW, BodyPart.RIGHT_WRIST), Color.RED);   // 🔵
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_SHOULDER, BodyPart.LEFT_ELBOW), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_ELBOW, BodyPart.LEFT_WRIST), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_SHOULDER, BodyPart.RIGHT_ELBOW), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_ELBOW, BodyPart.RIGHT_WRIST), Color.RED);
 
         // 🦵 Legs
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_HIP, BodyPart.LEFT_KNEE), Color.RED);    // 🔴
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_KNEE, BodyPart.LEFT_ANKLE), Color.RED);    // 🔴
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_HIP, BodyPart.RIGHT_KNEE), Color.BLUE); // 🔵
-        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE), Color.BLUE); // 🔵
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_HIP, BodyPart.LEFT_KNEE), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.LEFT_KNEE, BodyPart.LEFT_ANKLE), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_HIP, BodyPart.RIGHT_KNEE), Color.RED);
+        KEYPOINT_CONNECTIONS.put(new Pair<>(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE), Color.RED);
 
     }
 

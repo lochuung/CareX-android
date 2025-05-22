@@ -33,14 +33,15 @@
     <string name="start_session">Start Session</string>
     <string name="start_yoga_session">Start Yoga Session</string>
 
-    <!-- 10-Day Yoga Challenge -->
-    <string name="yoga_challenge">10-Day Yoga Challenge</string>
+    <!-- 10-Day Yoga Challenge -->    <string name="yoga_challenge">10-Day Yoga Challenge</string>
     <string name="continue_to_day">Continue to Day %d</string>
     <string name="day_progress">Progress: %d/10 days completed</string>
     <string name="program_days">Your 10-Day Program</string>
     <string name="start_pose">Start Pose</string>
     <string name="skip">Skip</string>
     <string name="hold_pose">Hold the pose</string>
+    <string name="yoga_duration_format">%d min %02d sec</string>
+    <string name="yoga_poses_count_format">%d poses</string>
 
     <!-- Report Fragment -->
     <string name="statistics">Statistics</string>

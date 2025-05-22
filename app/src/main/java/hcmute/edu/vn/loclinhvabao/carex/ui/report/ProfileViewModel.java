@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.model.UserProfile;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.model.YogaGoal;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.UserProfileRepository;
+import hcmute.edu.vn.loclinhvabao.carex.util.Constants;
 
 @HiltViewModel
 public class ProfileViewModel extends ViewModel {
@@ -22,11 +23,10 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     @Inject
-    public ProfileViewModel(UserProfileRepository userProfileRepository) {
-        this.userProfileRepository = userProfileRepository;
+    public ProfileViewModel(UserProfileRepository userProfileRepository) {        this.userProfileRepository = userProfileRepository;
 
         // Default user ID (in a real app, get this from Firebase Auth or similar)
-        String userId = "current_user";
+        String userId = Constants.CURRENT_USER_ID;
         loadUserProfile(userId);
     }
 
@@ -40,22 +40,26 @@ public class ProfileViewModel extends ViewModel {
 
     public LiveData<String> getErrorMessage() {
         return errorMessage;
-    }
-
-    public void loadUserProfile(String userId) {
+    }    public void loadUserProfile(String userId) {
         isLoading.setValue(true);
 
         // Observe the LiveData from repository
         LiveData<UserProfile> profileLiveData = userProfileRepository.getUserProfile(userId);
-        if (profileLiveData.getValue() == null) {
-            // Create default profile if not exists
-            userProfile.setValue(userProfileRepository.createDefaultProfile(userId, "Default User"));
+        
+        // We need to observe the LiveData to get its value
+        profileLiveData.observeForever(profile -> {
+            if (profile == null) {
+                // Create default profile if not exists
+                userProfile.setValue(userProfileRepository.createDefaultProfile(userId, Constants.DEFAULT_USER_NAME));
+            } else {
+                // Set the observed value
+                userProfile.setValue(profile);
+            }
             isLoading.setValue(false);
-        } else {
-            // Set the observed value
-            userProfile.setValue(profileLiveData.getValue());
-            isLoading.setValue(false);
-        }
+            
+            // Stop observing once we have the value
+            profileLiveData.removeObserver(__ -> {});
+        });
     }
 
     public void updateProfile(String name, float height, float weight, int age, YogaGoal goal) {
