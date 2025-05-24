@@ -76,6 +76,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Connect the navController with the BottomNavigationView
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+        ViewCompat.setOnApplyWindowInsetsListener(bottomNavigationView, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            View bottomNav = findViewById(R.id.bottom_navigation);
+            bottomNav.setPadding(0, 0, 0, 0); // thêm padding dưới theo hệ thống
+            return insets;
+        });
     }
 
     private void hideBottomNavigationView() {
