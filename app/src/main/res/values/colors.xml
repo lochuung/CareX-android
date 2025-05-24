@@ -47,4 +47,9 @@
     <color name="bmi_normal">#4CAF50</color>
     <color name="bmi_overweight">#FF9800</color>
     <color name="bmi_obese">#F44336</color>
+
+    <!-- Additional Color Aliases for Login Activity -->
+    <color name="background">@color/backgroundColor</color>
+    <color name="primaryText">@color/textPrimary</color>
+    <color name="secondaryText">@color/textSecondary</color>
 </resources>

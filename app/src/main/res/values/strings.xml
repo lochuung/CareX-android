@@ -128,4 +128,13 @@
     <string name="unknown">UNKNOWN</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Google OAuth -->
+    <string name="default_web_client_id">944598984328-6domete394j9q8eadpquu3ls3686jbjp.apps.googleusercontent.com</string>
+
+    <!-- Auth related strings -->
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="signing_in">Signing in...</string>
+    <string name="welcome_back">Welcome back!</string>
+    <string name="getting_started">Let\'s get started with your fitness journey</string>
 </resources>
