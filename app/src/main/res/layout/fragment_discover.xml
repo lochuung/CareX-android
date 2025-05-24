@@ -210,7 +210,7 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:src="@drawable/ic_steps_enhanced"
-                        app:tint="@color/orange_500" />
+                        app:tint="#FFFF" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -218,7 +218,7 @@
                         android:layout_marginTop="4dp"
                         android:text="85%"
                         android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                        android:textColor="@color/orange_500"
+                        app:tint="#FFFF"
                         android:textStyle="bold" />
 
                 </LinearLayout>
