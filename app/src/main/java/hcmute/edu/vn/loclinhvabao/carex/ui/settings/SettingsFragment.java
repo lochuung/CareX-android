@@ -1,5 +1,6 @@
 package hcmute.edu.vn.loclinhvabao.carex.ui.settings;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import java.util.List;
 import dagger.hilt.android.AndroidEntryPoint;
 import hcmute.edu.vn.loclinhvabao.carex.R;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.model.UserProfile;
+import hcmute.edu.vn.loclinhvabao.carex.ui.auth.LoginActivity;
 
 @AndroidEntryPoint
 public class SettingsFragment extends Fragment {
@@ -103,11 +105,19 @@ public class SettingsFragment extends Fragment {
     private void setupObservers() {
         viewModel.getUserProfile().observe(getViewLifecycleOwner(), this::updateUI);
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            // Show loading indicator if needed
+            if (btnSignOut != null) {
+                btnSignOut.setEnabled(!isLoading);
+                btnSignOut.setText(isLoading ? "Signing out..." : "Sign Out");
+            }
         });
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 // Show error message
+            }
+        });
+        viewModel.getIsLoggedOut().observe(getViewLifecycleOwner(), isLoggedOut -> {
+            if (isLoggedOut) {
+                navigateToLogin();
             }
         });
     }
@@ -132,14 +142,12 @@ public class SettingsFragment extends Fragment {
 
         // Reminder time - navigate to reminder settings
         llReminderTime.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(
-                    R.id.action_settingsFragment_to_reminderSettingsFragment);
+            // TODO: Implement reminder settings navigation
         });
 
         // Reminder days - navigate to reminder settings
         llReminderDays.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(
-                    R.id.action_settingsFragment_to_reminderSettingsFragment);
+            // TODO: Implement reminder settings navigation
         });
 
         // Theme setting
@@ -159,15 +167,33 @@ public class SettingsFragment extends Fragment {
 
         // Sign out button
         btnSignOut.setOnClickListener(v -> {
-            // TODO: Implement sign out functionality
+            viewModel.signOut();
         });
     }
 
     private void updateUI(UserProfile profile) {
         if (profile == null) return;
 
-        // Update profile info
-        tvUserName.setText(profile.getName());
+        // Use authenticated user name if available, otherwise use profile name
+        String displayName = viewModel.getCurrentUserDisplayName();
+        if (displayName != null && !displayName.isEmpty()) {
+            tvUserName.setText(displayName);
+        } else {
+            tvUserName.setText(profile.getName());
+        }
+
+        // Show authentication status
+        if (viewModel.isUserAuthenticated()) {
+            String email = viewModel.getCurrentUserEmail();
+            if (email != null) {
+                tvUserLevel.setText(email);
+            } else {
+                tvUserLevel.setText("Authenticated User");
+            }
+        } else {
+            tvUserLevel.setText("Local Profile");
+        }
+
         tvStreak.setText(getString(R.string.current_streak, profile.getCurrentStreak()));
 
         // Update personal info
@@ -186,6 +212,13 @@ public class SettingsFragment extends Fragment {
         switchReminders.setChecked(profile.isNotificationsEnabled());
         tvReminderTime.setText(formatTime(profile.getReminderTime()));
         tvReminderDays.setText(formatDays(profile.getReminderDays()));
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(requireActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        requireActivity().finish();
     }
 
     private String getBmiCategory(float bmi) {

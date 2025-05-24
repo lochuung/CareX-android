@@ -74,4 +74,37 @@ public class UserProfileRepository {
         saveProfile(profile);
         return profile;
     }
+
+    public void syncUserProfile(String userId, String userName, String userEmail) {
+        new Thread(() -> {
+            UserProfile existingProfile = getUserProfileSync(userId);
+            if (existingProfile == null) {
+                // Create new profile for new user
+                createDefaultProfile(userId, userName);
+            } else {
+                // Update existing profile with latest user info
+                existingProfile.setName(userName);
+                updateProfile(existingProfile);
+            }
+        }).start();
+    }
+
+    private UserProfile getUserProfileSync(String userId) {
+        try {
+            return UserProfileMapper.entityToModel(
+                userProfileDao.getUserProfileSync(userId));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void clearUserData() {
+        new Thread(() -> {
+            try {
+                userProfileDao.deleteAllProfiles();
+            } catch (Exception e) {
+                // Log error but don't throw
+            }
+        }).start();
+    }
 }

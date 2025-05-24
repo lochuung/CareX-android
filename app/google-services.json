@@ -13,7 +13,20 @@
           "package_name": "hcmute.edu.vn.loclinhvabao.carex"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "944598984328-6domete394j9q8eadpquu3ls3686jbjp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hcmute.edu.vn.loclinhvabao.carex",
+            "certificate_hash": "a6c5b1007e9f37e22cf6b0874fb95abd8fcb1d05"
+          }
+        },
+        {
+          "client_id": "944598984328-mk13bom1kd6rkjkecgevrlf09ld99iqe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB3SO5YtmTjoROvInrx7reRefnCeGtdFYQ"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "944598984328-mk13bom1kd6rkjkecgevrlf09ld99iqe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -40,6 +58,10 @@
             "package_name": "hcmute.edu.vn.loclinhvabao.healthtracker",
             "certificate_hash": "e535bd9fcb74f5f4a7e03638a8b9f022854d2854"
           }
+        },
+        {
+          "client_id": "944598984328-mk13bom1kd6rkjkecgevrlf09ld99iqe.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -49,7 +71,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "944598984328-mk13bom1kd6rkjkecgevrlf09ld99iqe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

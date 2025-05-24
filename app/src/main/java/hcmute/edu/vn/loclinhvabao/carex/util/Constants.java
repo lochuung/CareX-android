@@ -4,21 +4,23 @@ package hcmute.edu.vn.loclinhvabao.carex.util;
  * Application-wide constants
  */
 public class Constants {
-    /**
-     * Default user ID - used for initialization and when no specific user is selected
-     */
+    // Default user ID for local profile
+    public static final String CURRENT_USER_ID = "local_user";
     public static final String DEFAULT_USER_ID = "default_user";
-    
-    /**
-     * Default user name - used for initialization
-     */
     public static final String DEFAULT_USER_NAME = "CareX User";
     
-    /**
-     * Current user ID - used throughout the app for the active user
-     * This should be replaced with actual authentication in a production app
-     */
-    public static final String CURRENT_USER_ID = "default_user";
+    // SharedPreferences keys
+    public static final String PREF_USER_ID = "user_id";
+    public static final String PREF_USER_NAME = "user_name";
+    public static final String PREF_USER_EMAIL = "user_email";
+    
+    // Navigation
+    public static final String KEY_SESSION_ID = "sessionId";
+    
+    // Default values
+    public static final float DEFAULT_HEIGHT = 175.0f;
+    public static final float DEFAULT_WEIGHT = 70.0f;
+    public static final int DEFAULT_AGE = 30;
     
     private Constants() {
         // Private constructor to prevent instantiation
