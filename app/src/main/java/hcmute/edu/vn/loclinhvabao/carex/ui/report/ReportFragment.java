@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -124,10 +125,11 @@ public class ReportFragment extends Fragment {
                     R.id.action_reportFragment_to_progressFragment);
         });
 
-        // Profile image click - navigate to ProfileFragment
+        // Profile image click - navigate to Settings instead of Profile
         ivProfile.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(
-                    R.id.action_reportFragment_to_profileFragment);
+            // Navigate to Settings tab
+            ((BottomNavigationView) requireActivity().findViewById(R.id.bottom_navigation))
+                    .setSelectedItemId(R.id.settingsFragment);
         });
 
         // Set click listener for each activity item
