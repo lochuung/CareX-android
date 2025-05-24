@@ -18,7 +18,8 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
-    </fragment>    <fragment
+    </fragment>
+    <fragment
         android:id="@+id/discoverFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.discover.DiscoverFragment"
         android:label="fragment_discover"
@@ -77,6 +78,7 @@
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.report.ReportFragment"
         android:label="fragment_report"
         tools:layout="@layout/fragment_report">
+
         <action
             android:id="@+id/action_reportFragment_to_progressFragment"
             app:destination="@id/progressFragment"
@@ -84,20 +86,24 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_reportFragment_to_profileFragment"
-            app:destination="@id/profileFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
+
     </fragment>
 
     <fragment
         android:id="@+id/settingsFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.settings.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+
+        <action
+            android:id="@+id/action_settingsFragment_to_reminderSettingsFragment"
+            app:destination="@id/reminderSettingsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
 
     <!-- Yoga app fragments -->
     <fragment
