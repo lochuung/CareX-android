@@ -32,7 +32,19 @@
     <color name="purple_500">#9C27B0</color>
     <color name="teal_200">#03DAC5</color>
     <color name="orange_500">#FF9800</color>
-    <color name="blue_500">#2196F3</color>
-
-    <color name="errorColor">#FF0000</color>
+    <color name="blue_500">#2196F3</color>    <color name="errorColor">#FF0000</color>
+    
+    <!-- Material Design 3 Colors -->
+    <color name="primary">#4A90E2</color>
+    <color name="primary_light">#E3F2FD</color>
+    <color name="accent_light">#FFF3E0</color>
+    <color name="background_light">#F8F9FA</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    
+    <!-- BMI Category Colors -->
+    <color name="bmi_underweight">#2196F3</color>
+    <color name="bmi_normal">#4CAF50</color>
+    <color name="bmi_overweight">#FF9800</color>
+    <color name="bmi_obese">#F44336</color>
 </resources>

@@ -10,9 +10,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.card.MaterialCardView;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import hcmute.edu.vn.loclinhvabao.carex.R;
-import hcmute.edu.vn.loclinhvabao.carex.ui.discover.DiscoverFragmentDirections;
 
 @AndroidEntryPoint
 public class DiscoverFragment extends Fragment {
@@ -21,16 +22,36 @@ public class DiscoverFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_discover, container, false);
-    }    @Override
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        // Navigate to YogaCameraFragment using SafeArgs
-        DiscoverFragmentDirections.ActionDiscoverFragmentToYogaCameraFragment action =
-                DiscoverFragmentDirections.actionDiscoverFragmentToYogaCameraFragment()
-                        .setPose("cobra")
-                        .setTime(45);
+        setupClickListeners(view);
+    }    private void setupClickListeners(View view) {
+        // BMI Calculator Card Click
+        MaterialCardView bmiCard = view.findViewById(R.id.bmi_calculator_card);
+        if (bmiCard != null) {
+            bmiCard.setOnClickListener(v -> 
+                Navigation.findNavController(v).navigate(R.id.action_discoverFragment_to_bmiCalculatorFragment)
+            );
+        }
 
-        Navigation.findNavController(view).navigate(action);
+        // Step Counter Card Click
+        MaterialCardView stepCard = view.findViewById(R.id.step_counter_card);
+        if (stepCard != null) {
+            stepCard.setOnClickListener(v -> 
+                Navigation.findNavController(v).navigate(R.id.action_discoverFragment_to_stepCounterFragment)
+            );
+        }
+
+        // Diet Recommendation Card Click
+        MaterialCardView dietCard = view.findViewById(R.id.diet_recommendation_card);
+        if (dietCard != null) {
+            dietCard.setOnClickListener(v -> 
+                Navigation.findNavController(v).navigate(R.id.action_discoverFragment_to_dietRecommendationFragment)
+            );
+        }
     }
 }
