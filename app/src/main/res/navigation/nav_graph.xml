@@ -18,9 +18,7 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
-
-    <fragment
+    </fragment>    <fragment
         android:id="@+id/discoverFragment"
         android:name="hcmute.edu.vn.loclinhvabao.carex.ui.discover.DiscoverFragment"
         android:label="fragment_discover"
@@ -32,7 +30,47 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_discoverFragment_to_bmiCalculatorFragment"
+            app:destination="@id/bmiCalculatorFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_discoverFragment_to_stepCounterFragment"
+            app:destination="@id/stepCounterFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_discoverFragment_to_dietRecommendationFragment"
+            app:destination="@id/dietRecommendationFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
+
+    <!-- Discover Sub-fragments -->
+    <fragment
+        android:id="@+id/bmiCalculatorFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.discover.BmiCalculatorFragment"
+        android:label="fragment_bmi_calculator"
+        tools:layout="@layout/fragment_bmi_calculator" />
+
+    <fragment
+        android:id="@+id/stepCounterFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.discover.StepCounterFragment"
+        android:label="fragment_step_counter"
+        tools:layout="@layout/fragment_step_counter" />
+
+    <fragment
+        android:id="@+id/dietRecommendationFragment"
+        android:name="hcmute.edu.vn.loclinhvabao.carex.ui.discover.DietRecommendationFragment"
+        android:label="fragment_diet_recommendation"
+        tools:layout="@layout/fragment_diet_recommendation" />
 
     <fragment
         android:id="@+id/reportFragment"
