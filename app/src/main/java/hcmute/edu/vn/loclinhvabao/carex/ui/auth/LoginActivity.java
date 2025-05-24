@@ -13,8 +13,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import hcmute.edu.vn.loclinhvabao.carex.R;
+import hcmute.edu.vn.loclinhvabao.carex.data.repository.UserProfileRepository;
 import hcmute.edu.vn.loclinhvabao.carex.ui.MainActivity;
 
 @AndroidEntryPoint
@@ -27,6 +30,9 @@ public class LoginActivity extends AppCompatActivity {
     private LoginViewModel viewModel;
     private MaterialButton btnGoogleSignIn;
     private CircularProgressIndicator progressIndicator;
+
+    @Inject
+    UserProfileRepository userProfileRepository;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
 
         viewModel.isFullyAuthenticated().observe(this, isAuthenticated -> {
             if (isAuthenticated) {
-                navigateToMain();
+                syncUserDataAndNavigate();
             }
         });
     }
@@ -96,5 +102,19 @@ public class LoginActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void syncUserDataAndNavigate() {
+        // Get user info from Firebase/Google
+        String userId = viewModel.getCurrentUserId();
+        String userName = viewModel.getCurrentUserName();
+        String userEmail = viewModel.getCurrentUserEmail();
+
+        if (userId != null && userName != null) {
+            // Sync user profile data
+            userProfileRepository.syncUserProfile(userId, userName, userEmail);
+        }
+
+        navigateToMain();
     }
 }

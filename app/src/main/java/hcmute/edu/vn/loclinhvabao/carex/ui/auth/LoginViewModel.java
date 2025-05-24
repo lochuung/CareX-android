@@ -46,4 +46,16 @@ public class LoginViewModel extends ViewModel {
     public void signOut() {
         authRepository.signOut();
     }
+
+    public String getCurrentUserId() {
+        return authRepository.getCurrentUserId();
+    }
+
+    public String getCurrentUserName() {
+        return authRepository.getUserDisplayName();
+    }
+
+    public String getCurrentUserEmail() {
+        return authRepository.getUserEmail();
+    }
 }

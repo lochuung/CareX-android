@@ -131,4 +131,16 @@ public class GoogleOauth2Repository {
     public FirebaseUser getCurrentFirebaseUser() {
         return googleAuthRepository.getCurrentFirebaseUser();
     }
+
+    public String getCurrentUserId() {
+        FirebaseUser user = getCurrentFirebaseUser();
+        if (user != null) {
+            return user.getUid();
+        }
+        GoogleSignInAccount account = getCurrentGoogleAccount();
+        if (account != null) {
+            return account.getId();
+        }
+        return null;
+    }
 }

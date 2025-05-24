@@ -11,24 +11,35 @@ import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.model.UserProfile;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.model.YogaGoal;
+import hcmute.edu.vn.loclinhvabao.carex.data.repository.GoogleOauth2Repository;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.UserProfileRepository;
 import hcmute.edu.vn.loclinhvabao.carex.util.Constants;
 
 @HiltViewModel
 public class SettingsViewModel extends ViewModel {
     private final UserProfileRepository userProfileRepository;
+    private final GoogleOauth2Repository authRepository;
 
     private final MutableLiveData<UserProfile> userProfile = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoggedOut = new MutableLiveData<>(false);
 
     @Inject
-    public SettingsViewModel(UserProfileRepository userProfileRepository) {
+    public SettingsViewModel(UserProfileRepository userProfileRepository,
+                           GoogleOauth2Repository authRepository) {
         this.userProfileRepository = userProfileRepository;
+        this.authRepository = authRepository;
 
-        // Default user ID (in a real app, get this from Firebase Auth or similar)
-        String userId = Constants.CURRENT_USER_ID;
-        loadUserProfile(userId);
+        // Get current user ID from auth repository
+        String userId = authRepository.getCurrentUserId();
+        if (userId != null) {
+            loadUserProfile(userId);
+        } else {
+            // No authenticated user, create default profile
+            String defaultUserId = Constants.CURRENT_USER_ID;
+            loadUserProfile(defaultUserId);
+        }
     }
 
     public LiveData<UserProfile> getUserProfile() {
@@ -41,6 +52,10 @@ public class SettingsViewModel extends ViewModel {
 
     public LiveData<String> getErrorMessage() {
         return errorMessage;
+    }
+
+    public LiveData<Boolean> getIsLoggedOut() {
+        return isLoggedOut;
     }
 
     public void loadUserProfile(String userId) {
@@ -90,5 +105,33 @@ public class SettingsViewModel extends ViewModel {
                     profile.getId(), enabled, time, days);
             userProfile.setValue(profile);
         }
+    }
+
+    public void signOut() {
+        isLoading.setValue(true);
+        
+        // Clear user data
+        userProfileRepository.clearUserData();
+        
+        // Sign out from auth providers
+        authRepository.signOut();
+        
+        // Clear current profile
+        userProfile.setValue(null);
+        
+        isLoading.setValue(false);
+        isLoggedOut.setValue(true);
+    }
+
+    public String getCurrentUserDisplayName() {
+        return authRepository.getUserDisplayName();
+    }
+
+    public String getCurrentUserEmail() {
+        return authRepository.getUserEmail();
+    }
+
+    public boolean isUserAuthenticated() {
+        return authRepository.isFullyAuthenticated();
     }
 }

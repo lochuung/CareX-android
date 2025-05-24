@@ -2,6 +2,7 @@ package hcmute.edu.vn.loclinhvabao.carex.data.local.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -31,4 +32,13 @@ public interface UserProfileDao {
 
     @Query("UPDATE user_profiles SET currentStreak = :streak WHERE id = :userId")
     void updateStreak(String userId, int streak);
+
+    @Query("SELECT * FROM user_profiles WHERE id = :userId")
+    UserProfileEntity getUserProfileSync(String userId);
+
+    @Query("DELETE FROM user_profiles")
+    void deleteAllProfiles();
+
+    @Delete
+    void deleteProfile(UserProfileEntity profile);
 }

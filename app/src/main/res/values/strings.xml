@@ -89,7 +89,7 @@
     <string name="profile">Profile</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="intermediate_level">Intermediate Level</string>
-    <string name="current_streak">14 Day Streak</string>
+    <string name="current_streak">🔥 %d day streak</string>
     <string name="personal_information">Personal Information</string>
     <string name="height">Height</string>
     <string name="weight">Weight</string>
