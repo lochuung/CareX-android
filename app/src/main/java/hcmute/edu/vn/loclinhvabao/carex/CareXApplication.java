@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.hilt.work.HiltWorkerFactory;
 import androidx.room.Room;
 import androidx.work.Configuration;
@@ -23,7 +24,7 @@ public class CareXApplication extends Application implements Configuration.Provi
 
     @Inject
     HiltWorkerFactory workerFactory;
-    
+
     @Inject
     DataSeeder dataSeeder;
 
@@ -33,7 +34,7 @@ public class CareXApplication extends Application implements Configuration.Provi
 
         // Create notification channel
         NotificationUtils.createNotificationChannel(this);
-        
+
         // Seed database with initial data if needed
         try {
             dataSeeder.seedDatabaseIfNeeded();
@@ -42,6 +43,8 @@ public class CareXApplication extends Application implements Configuration.Provi
             // If database is corrupted, recreate it
             handleDatabaseCorruption(getApplicationContext());
         }
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 
     @Override
@@ -50,7 +53,7 @@ public class CareXApplication extends Application implements Configuration.Provi
                 .setWorkerFactory(workerFactory)
                 .build();
     }
-    
+
     /**
      * Handle database corruption by deleting and recreating the database.
      * This is a last resort solution when migrations fail.
@@ -59,13 +62,13 @@ public class CareXApplication extends Application implements Configuration.Provi
         try {
             Log.w(TAG, "Attempting to handle database corruption by rebuilding the database");
             context.deleteDatabase("carex.db");
-            
+
             // Rebuild database with fallback to destructive migration
             Room.databaseBuilder(context, AppDatabase.class, "carex.db")
                     .addMigrations(DatabaseMigrations.MIGRATION_1_2)
                     .fallbackToDestructiveMigration()
                     .build();
-                    
+
             Log.i(TAG, "Database rebuilt successfully");
         } catch (Exception e) {
             Log.e(TAG, "Failed to rebuild database: " + e.getMessage(), e);
