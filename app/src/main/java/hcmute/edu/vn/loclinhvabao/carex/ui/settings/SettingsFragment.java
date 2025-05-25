@@ -144,7 +144,7 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        // Reminder time - navigate to reminder settings
+        // Reminder settings
         switchReminders.setOnCheckedChangeListener((buttonView, isChecked) -> {
             UserProfile profile = viewModel.getUserProfile().getValue();
             if (profile != null) {
@@ -154,6 +154,11 @@ public class SettingsFragment extends Fragment {
                         profile.getReminderDays()
                 );
             }
+        });
+
+        // Reminder time - navigate to reminder settings
+        llReminderTime.setOnClickListener(v -> {
+            // TODO: Implement reminder settings navigation
         });
 
         // Reminder days - navigate to reminder settings
