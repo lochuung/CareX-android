@@ -26,15 +26,34 @@ public class ProgressRepository {
     public ProgressRepository(ProgressDao progressDao, ProgressMapper progressMapper) {
         this.progressDao = progressDao;
         this.progressMapper = progressMapper;
-    }
-
-    /**
+    }    /**
      * Insert a new progress record
      * @param progress The Progress object to insert
      */
     public void insertProgress(Progress progress) {
         ProgressEntity entity = progressMapper.modelToEntity(progress);
         new Thread(() -> progressDao.insertProgress(entity)).start();
+    }
+
+    /**
+     * Insert a new progress record with better error handling
+     * This method catches foreign key constraint errors and handles them gracefully
+     * @param progress The Progress object to insert
+     */
+    public void insertProgressSafely(Progress progress) {
+        ProgressEntity entity = progressMapper.modelToEntity(progress);
+        new Thread(() -> {
+            try {
+                progressDao.insertProgress(entity);
+            } catch (android.database.sqlite.SQLiteConstraintException e) {
+                // Log the foreign key constraint error but don't crash
+                android.util.Log.e("ProgressRepository", "Foreign key constraint error when inserting progress", e);
+                // Optionally, try to create the missing dependencies here
+            } catch (Exception e) {
+                // Log any other database errors
+                android.util.Log.e("ProgressRepository", "Database error when inserting progress", e);
+            }
+        }).start();
     }
 
     /**
@@ -178,11 +197,18 @@ public class ProgressRepository {
         });
         thread.start();
         try {
-            thread.join();
-        } catch (InterruptedException e) {
+            thread.join();        } catch (InterruptedException e) {
             e.printStackTrace();
             return 0;
         }
         return confidence[0];
+    }
+
+    /**
+     * Delete all progress records for a user
+     * @param userId The user's ID
+     */
+    public void deleteAllProgressForUser(String userId) {
+        new Thread(() -> progressDao.deleteAllProgressForUser(userId)).start();
     }
 }

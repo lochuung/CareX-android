@@ -24,9 +24,9 @@
     <color name="gymColor">#F44336</color>
     <color name="cyclingColor">#2196F3</color>
     <color name="swimmingColor">#00BCD4</color>
-    
-    <!-- Dividers -->
+      <!-- Dividers -->
     <color name="dividerColor">#E0E0E0</color>
+    <color name="lightGray">#E0E0E0</color>
     
     <!-- Additional Colors from master branch -->
     <color name="purple_500">#9C27B0</color>

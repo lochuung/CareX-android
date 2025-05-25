@@ -24,9 +24,7 @@ public class DailyProgressRepository {
     @Inject
     public DailyProgressRepository(DailyProgressDao dailyProgressDao) {
         this.dailyProgressDao = dailyProgressDao;
-    }
-
-    /**
+    }    /**
      * Insert a new daily progress record
      * @param dailyProgress The DailyProgress object to insert
      * @param userId The user's ID
@@ -34,6 +32,28 @@ public class DailyProgressRepository {
     public void insertDailyProgress(DailyProgress dailyProgress, String userId) {
         DailyProgressEntity entity = DailyProgressMapper.modelToEntity(dailyProgress, userId);
         new Thread(() -> dailyProgressDao.insertDailyProgress(entity)).start();
+    }
+
+    /**
+     * Insert a new daily progress record with better error handling
+     * This method catches foreign key constraint errors and handles them gracefully
+     * @param dailyProgress The DailyProgress object to insert
+     * @param userId The user's ID
+     */
+    public void insertDailyProgressSafely(DailyProgress dailyProgress, String userId) {
+        DailyProgressEntity entity = DailyProgressMapper.modelToEntity(dailyProgress, userId);
+        new Thread(() -> {
+            try {
+                dailyProgressDao.insertDailyProgress(entity);
+            } catch (android.database.sqlite.SQLiteConstraintException e) {
+                // Log the foreign key constraint error but don't crash
+                android.util.Log.e("DailyProgressRepository", "Foreign key constraint error when inserting daily progress", e);
+                // Optionally, try to create the missing user profile here
+            } catch (Exception e) {
+                // Log any other database errors
+                android.util.Log.e("DailyProgressRepository", "Database error when inserting daily progress", e);
+            }
+        }).start();
     }
 
     /**
@@ -202,11 +222,18 @@ public class DailyProgressRepository {
         });
         thread.start();
         try {
-            thread.join();
-        } catch (InterruptedException e) {
+            thread.join();        } catch (InterruptedException e) {
             e.printStackTrace();
             return 0;
         }
         return count[0];
+    }
+
+    /**
+     * Delete all daily progress records for a user
+     * @param userId The user's ID
+     */
+    public void deleteAllDailyProgressForUser(String userId) {
+        new Thread(() -> dailyProgressDao.deleteAllDailyProgressForUser(userId)).start();
     }
 }

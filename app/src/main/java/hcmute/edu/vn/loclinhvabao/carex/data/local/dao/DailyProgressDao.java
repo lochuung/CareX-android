@@ -45,8 +45,9 @@ public interface DailyProgressDao {
     float getAverageScoreForUser(String userId);
 
     @Query("SELECT * FROM daily_progress WHERE userId = :userId ORDER BY dateTimestamp DESC LIMIT 1")
-    DailyProgressEntity getLatestDailyProgress(String userId);
-
-    @Query("SELECT COUNT(DISTINCT strftime('%Y-%m-%d', dateTimestamp / 1000, 'unixepoch')) FROM daily_progress WHERE userId = :userId")
+    DailyProgressEntity getLatestDailyProgress(String userId);    @Query("SELECT COUNT(DISTINCT strftime('%Y-%m-%d', dateTimestamp / 1000, 'unixepoch')) FROM daily_progress WHERE userId = :userId")
     int getUniquePracticeDaysCount(String userId);
+
+    @Query("DELETE FROM daily_progress WHERE userId = :userId")
+    void deleteAllDailyProgressForUser(String userId);
 }

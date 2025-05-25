@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,13 +33,10 @@ import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.adapters.YogaDayAdapter;
 import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.models.YogaDay;
 
 @AndroidEntryPoint
-public class HomeFragment extends Fragment implements YogaDayAdapter.OnDayClickListener {
-
-    private SharedViewModel sharedViewModel;
-    private RecyclerView rvYogaDays;
+public class HomeFragment extends Fragment implements YogaDayAdapter.OnDayClickListener {    private SharedViewModel sharedViewModel;    private RecyclerView rvYogaDays;
     private YogaDayAdapter adapter;
     private TextView tvProgress;
-    private MaterialButton btnCurrentDay;
+    private ProgressBar progressOverall;
     
     // Statistics views
     private TextView tvCaloriesValue;
@@ -56,18 +55,15 @@ public class HomeFragment extends Fragment implements YogaDayAdapter.OnDayClickL
         
         // Initialize ViewModel
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-        
-        // Initialize UI
+          // Initialize UI
         initUI(view);
         setupRecyclerView();
         observeViewModel();
-        checkForRecentCompletion();
-    }
-
-    private void initUI(View view) {
+        // Removed checkForRecentCompletion() - now handled via ViewModel events
+    }    private void initUI(View view) {
         TextView tvWelcomeMessage = view.findViewById(R.id.tv_welcome_message);
-        tvProgress = view.findViewById(R.id.tv_progress);
-        btnCurrentDay = view.findViewById(R.id.btn_current_day);
+        tvProgress = view.findViewById(R.id.tv_progress);        
+        progressOverall = view.findViewById(R.id.progress_overall);
         rvYogaDays = view.findViewById(R.id.rv_yoga_days);
         
         // Initialize statistics views
@@ -75,16 +71,16 @@ public class HomeFragment extends Fragment implements YogaDayAdapter.OnDayClickL
         tvTimeValue = view.findViewById(R.id.tv_time_value);
         tvScoreValue = view.findViewById(R.id.tv_score_value);
         
-        btnCurrentDay.setOnClickListener(v -> navigateToCurrentDay());
+        // Initialize reset button
+        Button btnResetProgress = view.findViewById(R.id.btn_reset_progress);
+        btnResetProgress.setOnClickListener(v -> showResetConfirmationDialog());
     }
 
     private void setupRecyclerView() {
         adapter = new YogaDayAdapter(this);
         rvYogaDays.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvYogaDays.setAdapter(adapter);
-    }
-
-    private void observeViewModel() {
+    }    private void observeViewModel() {
         // Observe yoga days
         sharedViewModel.getYogaDays().observe(getViewLifecycleOwner(), yogaDays -> adapter.submitList(yogaDays));
         
@@ -96,6 +92,15 @@ public class HomeFragment extends Fragment implements YogaDayAdapter.OnDayClickL
         
         // Observe detailed progress for statistics
         sharedViewModel.getDetailedProgress().observe(getViewLifecycleOwner(), progress -> updateStatistics());
+        
+        // Observe completion events (only show congratulation when actually completing, not on fragment creation)
+        sharedViewModel.getDayCompletionEvent().observe(getViewLifecycleOwner(), completionData -> {
+            if (completionData != null) {
+                showCongratulationMessage(completionData);
+                // Clear the event after showing
+                sharedViewModel.clearCompletionEvent();
+            }
+        });
         
         // Initialize statistics
         updateStatistics();
@@ -117,46 +122,14 @@ public class HomeFragment extends Fragment implements YogaDayAdapter.OnDayClickL
         }
         
         // Get the total completed days directly from the ViewModel
-        int verifiedCompletedDays = sharedViewModel.getCompletedDaysCount();
-        
-        // Update progress text with percentage
+        int verifiedCompletedDays = sharedViewModel.getCompletedDaysCount();        // Update progress text with percentage
         int progressPercentage = completedDays * 10;
         tvProgress.setText(String.format("Progress: %d/10 days completed (%d%%)", completedDays, progressPercentage));
         
-        // Update current day button
-        btnCurrentDay.setText(String.format("Continue to Day %d", nextDay));
-    }
-    
-    private void navigateToCurrentDay() {
-        // Find the next uncompleted day
-        Map<Integer, Boolean> progress = sharedViewModel.getUserProgress().getValue();
-        if (progress == null) return;
-        
-        int nextDay = 1;
-        for (Map.Entry<Integer, Boolean> entry : progress.entrySet()) {
-            if (!entry.getValue()) {
-                if (nextDay == 1 || entry.getKey() < nextDay) {
-                    nextDay = entry.getKey();
-                }
-            }
-        }
-        
-        // Find the YogaDay object for the next day
-        List<YogaDay> yogaDays = sharedViewModel.getYogaDays().getValue();
-        if (yogaDays == null) return;
-        
-        for (YogaDay day : yogaDays) {
-            if (day.getDayNumber() == nextDay) {
-                sharedViewModel.selectYogaDay(day);
-                
-                // Navigate to exercise detail fragment
-                Navigation.findNavController(requireView())
-                        .navigate(R.id.action_homeFragment_to_exerciseDetailFragment);
-                break;
-            }
-        }
-    }
-
+        // Update progress bar
+        progressOverall.setProgress(progressPercentage);
+        progressOverall.setMax(100);
+    }    
     @Override
     public void onDayClick(YogaDay day) {
         // Set selected day in ViewModel
@@ -165,68 +138,76 @@ public class HomeFragment extends Fragment implements YogaDayAdapter.OnDayClickL
         // Navigate to exercise detail fragment
         Navigation.findNavController(requireView())
                 .navigate(R.id.action_homeFragment_to_exerciseDetailFragment);
-    }
-
-    @SuppressLint("DefaultLocale")
+    }    @SuppressLint("DefaultLocale")
     private void updateStatistics() {
-        // Get statistics from the ViewModel
-        int totalCalories = sharedViewModel.getTotalCaloriesBurned();
-        int totalDuration = sharedViewModel.getTotalDuration();
-        float avgConfidence = sharedViewModel.getAverageConfidence();
-        
-        // Format the duration from seconds to minutes
-        int minutes = totalDuration / 60;
-        
-        // Update UI
-        tvCaloriesValue.setText(String.valueOf(totalCalories));
-        tvTimeValue.setText(String.format("%d min", minutes));
-        tvScoreValue.setText(String.format("%.0f%%", avgConfidence * 100));
-    }
-
-    /**
-     * Check if user has completed a day recently and show congratulation
-     */
-    private void checkForRecentCompletion() {
-        // Get the completed progress
-        sharedViewModel.getCompletedProgress().observe(getViewLifecycleOwner(), progressList -> {
-            if (progressList != null && !progressList.isEmpty()) {
-                // Sort by completion date to get the most recent
-                progressList.sort((a, b) -> b.getCompletionDate().compareTo(a.getCompletionDate()));
-                
-                // Check if the most recent completion was today
-                Progress mostRecent = progressList.get(0);
-                Date now = new Date();
-                long diffInMillis = now.getTime() - mostRecent.getCompletionDate().getTime();
-                long diffInHours = diffInMillis / (60 * 60 * 1000);
-                
-                // If completed in the last 2 hours, show congratulation
-                if (diffInHours < 2) {
-                    showCongratulationMessage(mostRecent);
-                }
+        // Get statistics from the ViewModel asynchronously
+        new Thread(() -> {
+            int totalCalories = sharedViewModel.getTotalCaloriesBurned();
+            int totalDuration = sharedViewModel.getTotalDuration();
+            float avgConfidence = sharedViewModel.getAverageConfidence();
+            
+            // Update UI on main thread
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    // Format the duration from seconds to minutes and seconds
+                    int minutes = totalDuration / 60;
+                    int seconds = totalDuration % 60;
+                    
+                    // Update UI
+                    tvCaloriesValue.setText(String.valueOf(totalCalories));
+                    tvTimeValue.setText(String.format("%d:%02d", minutes, seconds));
+                    tvScoreValue.setText(String.format("%.0f%%", avgConfidence * 100));
+                });
             }
-        });
-    }
-    
-    /**
+        }).start();
+    }/**
      * Show a congratulation message when a day is completed
+     * Now receives completion data directly from ViewModel event
      */
     @SuppressLint("DefaultLocale")
     private void showCongratulationMessage(Progress progress) {
         // Create dialog to show congratulation
+        int totalSeconds = progress.getDuration();
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        
         new AlertDialog.Builder(requireContext())
             .setTitle("Congratulations!")
             .setMessage(String.format(
                 "You've completed Day %d!\n\n" +
-                "Time: %d minutes\n" +
+                "Time: %d:%02d\n" +
                 "Calories burned: %d\n" +
                 "Performance score: %.0f%%", 
                 progress.getDayNumber(),
-                progress.getDuration() / 60,
+                minutes,
+                seconds,
                 progress.getCalories(),
                 progress.getAverageConfidence() * 100
             ))
             .setPositiveButton("Great!", null)
             .setIcon(R.drawable.ic_celebration)
+            .show();
+    }
+
+    /**
+     * Show confirmation dialog before resetting progress
+     */
+    private void showResetConfirmationDialog() {
+        new AlertDialog.Builder(requireContext())
+            .setTitle("Reset Progress")
+            .setMessage("Are you sure you want to reset all your progress? This action cannot be undone.")
+            .setPositiveButton("Reset", (dialog, which) -> {
+                // Reset all progress via ViewModel
+                sharedViewModel.resetAllProgress();
+                
+                // Show confirmation message
+                new AlertDialog.Builder(requireContext())
+                    .setTitle("Progress Reset")
+                    .setMessage("Your progress has been successfully reset. You can start the 10-day yoga challenge again!")
+                    .setPositiveButton("OK", null)
+                    .show();
+            })
+            .setNegativeButton("Cancel", null)
             .show();
     }
 }
