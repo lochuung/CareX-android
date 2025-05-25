@@ -108,11 +108,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Quyền được cấp, có thể hiển thị thông báo
+                // Permission granted - notifications can be shown
+                Toast.makeText(this, "Notification permission granted", Toast.LENGTH_SHORT).show();
             } else {
-                // Quyền bị từ chối, hiển thị thông báo cho người dùng
-                Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show();
-                // Bạn có thể thêm logic để hướng dẫn người dùng đến cài đặt để bật quyền
+                // Permission denied - show user message
+                Toast.makeText(this, "Notification permission denied. You won't receive workout reminders.",
+                        Toast.LENGTH_LONG).show();
+                // You can add logic to guide user to settings to enable permission
             }
         }
     }

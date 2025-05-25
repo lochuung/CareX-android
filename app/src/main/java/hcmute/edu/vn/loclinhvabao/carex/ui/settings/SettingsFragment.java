@@ -19,12 +19,15 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import hcmute.edu.vn.loclinhvabao.carex.R;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.model.UserProfile;
 import hcmute.edu.vn.loclinhvabao.carex.ui.auth.LoginActivity;
+import hcmute.edu.vn.loclinhvabao.carex.util.NotificationUtils;
 
 @AndroidEntryPoint
 public class SettingsFragment extends Fragment {
@@ -136,22 +139,58 @@ public class SettingsFragment extends Fragment {
         switchReminders.setOnCheckedChangeListener((buttonView, isChecked) -> {
             UserProfile profile = viewModel.getUserProfile().getValue();
             if (profile != null) {
+                // Update settings
                 viewModel.updateNotificationSettings(
                         isChecked,
-                        profile.getReminderTime(),
-                        profile.getReminderDays()
+                        profile.getReminderTime() != null ? profile.getReminderTime() : "08:00",
+                        profile.getReminderDays() != null ? profile.getReminderDays() :
+                                Arrays.asList("MONDAY", "WEDNESDAY", "FRIDAY")
                 );
+
+                if (isChecked) {
+                    // Enable reminder - schedule notifications
+                    NotificationUtils.scheduleReminders(
+                            requireContext(),
+                            profile.getReminderTime() != null ? profile.getReminderTime() : "08:00",
+                            profile.getReminderDays() != null ? profile.getReminderDays() :
+                                    Arrays.asList("MONDAY", "WEDNESDAY", "FRIDAY")
+                    );
+
+                    // Show confirmation
+                    if (getView() != null) {
+                        Snackbar.make(getView(), "Workout reminders enabled!", Snackbar.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // Disable reminder - cancel scheduled notifications
+                    androidx.work.WorkManager.getInstance(requireContext())
+                            .cancelUniqueWork("YOGA_REMINDERS");
+
+                    if (getView() != null) {
+                        Snackbar.make(getView(), "Workout reminders disabled", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
         // Reminder time - navigate to reminder settings
         llReminderTime.setOnClickListener(v -> {
-            // TODO: Implement reminder settings navigation
+            // Thử navigate đến ReminderSettingsFragment
+            try {
+                Navigation.findNavController(v).navigate(R.id.action_settingsFragment_to_reminderSettingsFragment);
+            } catch (Exception e) {
+                // Nếu không có navigation, mở dialog time picker
+                showTimePickerDialog();
+            }
         });
 
         // Reminder days - navigate to reminder settings
         llReminderDays.setOnClickListener(v -> {
-            // TODO: Implement reminder settings navigation
+            try {
+                Navigation.findNavController(v).navigate(R.id.action_settingsFragment_to_reminderSettingsFragment);
+            } catch (Exception e) {
+                // Nếu không có navigation, mở dialog chọn ngày
+                showDaySelectionDialog();
+            }
         });
 
         // Theme setting
@@ -273,5 +312,91 @@ public class SettingsFragment extends Fragment {
         );
 
         editDialog.show();
+    }
+    private void showTimePickerDialog() {
+        UserProfile profile = viewModel.getUserProfile().getValue();
+        if (profile == null) return;
+
+        String currentTime = profile.getReminderTime();
+        if (currentTime == null) currentTime = "08:00";
+
+        String[] parts = currentTime.split(":");
+        int hour = Integer.parseInt(parts[0]);
+        int minute = Integer.parseInt(parts[1]);
+
+        android.app.TimePickerDialog timePickerDialog = new android.app.TimePickerDialog(
+                requireContext(),
+                (view, hourOfDay, minuteOfDay) -> {
+                    String newTime = String.format("%02d:%02d", hourOfDay, minuteOfDay);
+                    viewModel.updateNotificationSettings(
+                            profile.isNotificationsEnabled(),
+                            newTime,
+                            profile.getReminderDays()
+                    );
+
+                    // Reschedule reminders with new time
+                    if (profile.isNotificationsEnabled()) {
+                        NotificationUtils.scheduleReminders(
+                                requireContext(),
+                                newTime,
+                                profile.getReminderDays()
+                        );
+                    }
+                },
+                hour,
+                minute,
+                true // 24 hour format
+        );
+
+        timePickerDialog.show();
+    }
+
+    private void showDaySelectionDialog() {
+        UserProfile profile = viewModel.getUserProfile().getValue();
+        if (profile == null) return;
+
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        String[] dayValues = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
+
+        boolean[] checkedItems = new boolean[days.length];
+        List<String> currentDays = profile.getReminderDays();
+        if (currentDays == null) currentDays = new ArrayList<>();
+
+        for (int i = 0; i < dayValues.length; i++) {
+            checkedItems[i] = currentDays.contains(dayValues[i]);
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+        builder.setTitle("Select Reminder Days");
+        builder.setMultiChoiceItems(days, checkedItems, (dialog, which, isChecked) -> {
+            checkedItems[which] = isChecked;
+        });
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            List<String> selectedDays = new ArrayList<>();
+            for (int i = 0; i < checkedItems.length; i++) {
+                if (checkedItems[i]) {
+                    selectedDays.add(dayValues[i]);
+                }
+            }
+
+            viewModel.updateNotificationSettings(
+                    profile.isNotificationsEnabled(),
+                    profile.getReminderTime(),
+                    selectedDays
+            );
+
+            // Reschedule reminders with new days
+            if (profile.isNotificationsEnabled()) {
+                NotificationUtils.scheduleReminders(
+                        requireContext(),
+                        profile.getReminderTime(),
+                        selectedDays
+                );
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 }

@@ -23,37 +23,40 @@ public class YogaReminderWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        // Get input data
-        String reminderTime = getInputData().getString("reminderTime");
-        String[] reminderDaysArray = getInputData().getStringArray("reminderDays");
+        try {
+            // Get input data
+            String reminderTime = getInputData().getString("reminderTime");
+            String[] reminderDaysArray = getInputData().getStringArray("reminderDays");
 
-        if (reminderTime == null || reminderDaysArray == null || reminderDaysArray.length == 0) {
+            if (reminderTime == null || reminderDaysArray == null || reminderDaysArray.length == 0) {
+                return Result.failure();
+            }
+
+            List<String> reminderDays = Arrays.asList(reminderDaysArray);
+
+            // Check if today is a reminder day
+            Calendar calendar = Calendar.getInstance();
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            String today = getDayNameFromCalendar(dayOfWeek);
+
+            if (reminderDays.contains(today)) {
+                // Format the reminder time for display
+                String formattedTime = formatTime(reminderTime);
+
+                // Show the reminder notification with English messages
+                NotificationUtils.showYogaReminder(
+                        getApplicationContext(),
+                        "Time for Yoga! 🧘‍♀️",
+                        "Your " + formattedTime + " yoga session is ready to begin. Take a moment for yourself!"
+                );
+            }
+
+            return Result.success();
+
+        } catch (Exception e) {
+            android.util.Log.e("YogaReminderWorker", "Error in doWork", e);
             return Result.failure();
         }
-
-        List<String> reminderDays = Arrays.asList(reminderDaysArray);
-
-        // Check if today is a reminder day
-        Calendar calendar = Calendar.getInstance();
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        String today = getDayNameFromCalendar(dayOfWeek);
-
-        if (reminderDays.contains(today)) {
-            // Format the reminder time for display
-            String formattedTime = formatTime(reminderTime);
-
-            // Show the reminder notification
-            NotificationUtils.showYogaReminder(
-                    getApplicationContext(),
-                    "Time for Yoga!",
-                    "Your " + formattedTime + " yoga session is ready to begin. Namaste!"
-            );
-        }
-
-        // Schedule the next reminder
-        NotificationUtils.scheduleReminders(getApplicationContext(), reminderTime, reminderDays);
-
-        return Result.success();
     }
 
     private String getDayNameFromCalendar(int dayOfWeek) {
