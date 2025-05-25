@@ -13,6 +13,15 @@ public enum YogaGoal {
         this.displayName = displayName;
     }
 
+    public static YogaGoal fromDisplayName(String displayName) {
+        for (YogaGoal goal : values()) {
+            if (goal.getDisplayName().equals(displayName)) {
+                return goal;
+            }
+        }
+        return FLEXIBILITY; // Default value
+    }
+
     public String getDisplayName() {
         return displayName;
     }

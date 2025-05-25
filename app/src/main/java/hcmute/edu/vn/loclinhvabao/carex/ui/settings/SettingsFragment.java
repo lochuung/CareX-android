@@ -16,6 +16,7 @@ import androidx.navigation.Navigation;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.List;
@@ -125,7 +126,10 @@ public class SettingsFragment extends Fragment {
     private void setupClickListeners() {
         // Edit profile button
         btnEditProfile.setOnClickListener(v -> {
-            // TODO: Navigate to edit profile screen or show dialog
+            UserProfile profile = viewModel.getUserProfile().getValue();
+            if (profile != null) {
+                showEditProfileDialog(profile);
+            }
         });
 
         // Reminder settings
@@ -141,8 +145,15 @@ public class SettingsFragment extends Fragment {
         });
 
         // Reminder time - navigate to reminder settings
-        llReminderTime.setOnClickListener(v -> {
-            // TODO: Implement reminder settings navigation
+        switchReminders.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            UserProfile profile = viewModel.getUserProfile().getValue();
+            if (profile != null) {
+                viewModel.updateNotificationSettings(
+                        isChecked,
+                        profile.getReminderTime(),
+                        profile.getReminderDays()
+                );
+            }
         });
 
         // Reminder days - navigate to reminder settings
@@ -255,5 +266,19 @@ public class SettingsFragment extends Fragment {
         }
 
         return sb.toString();
+    }
+    private void showEditProfileDialog(UserProfile profile) {
+        EditProfileDialog editDialog = new EditProfileDialog(
+                requireContext(),
+                profile,
+                (name, height, weight, age, goal) -> {
+                    viewModel.updateProfile(name, height, weight, age, goal);
+                    if (getView() != null) {
+                        Snackbar.make(getView(), "Profile updated successfully!", Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        editDialog.show();
     }
 }
