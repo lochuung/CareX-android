@@ -184,7 +184,9 @@ public class ReminderSettingsFragment extends Fragment {
 
         // Save button
         btnSaveSettings.setOnClickListener(v -> {
-            saveSettings();
+            if (validateSettings()) {
+                saveSettings();
+            }
         });
     }
 
@@ -227,20 +229,43 @@ public class ReminderSettingsFragment extends Fragment {
         if (cbSunday.isChecked()) days.add("SUNDAY");
         viewModel.setReminderDays(days);
 
-        // Save settings
+        // Save settings to repository
         viewModel.saveSettings();
 
-        // Schedule reminders
-        if (viewModel.getReminderEnabled().getValue()) {
+        // Schedule or cancel reminders based on enabled state
+        Boolean reminderEnabled = viewModel.getReminderEnabled().getValue();
+        if (reminderEnabled != null && reminderEnabled && !days.isEmpty()) {
+            // Schedule reminders
             NotificationUtils.scheduleReminders(
                     requireContext(),
                     time,
                     days
             );
+            Toast.makeText(requireContext(), "Reminders scheduled for " + time, Toast.LENGTH_SHORT).show();
+        } else {
+            // Cancel existing reminders
+            androidx.work.WorkManager.getInstance(requireContext())
+                    .cancelUniqueWork("YOGA_REMINDERS");
+            Toast.makeText(requireContext(), "Reminders disabled", Toast.LENGTH_SHORT).show();
         }
 
-        // Show confirmation and navigate back
-        Toast.makeText(requireContext(), "Settings saved", Toast.LENGTH_SHORT).show();
+        // Navigate back
         Navigation.findNavController(requireView()).popBackStack();
+    }
+    private boolean validateSettings() {
+        Boolean reminderEnabled = viewModel.getReminderEnabled().getValue();
+        if (reminderEnabled != null && reminderEnabled) {
+            // Check if at least one day is selected
+            boolean anyDaySelected = cbMonday.isChecked() || cbTuesday.isChecked() ||
+                    cbWednesday.isChecked() || cbThursday.isChecked() ||
+                    cbFriday.isChecked() || cbSaturday.isChecked() ||
+                    cbSunday.isChecked();
+
+            if (!anyDaySelected) {
+                Toast.makeText(requireContext(), "Please select at least one day", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        return true;
     }
 }

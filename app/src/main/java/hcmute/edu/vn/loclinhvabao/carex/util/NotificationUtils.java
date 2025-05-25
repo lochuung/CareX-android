@@ -29,11 +29,13 @@ public class NotificationUtils {
     public static void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Yoga Reminders";
-            String description = "Reminders for your scheduled yoga sessions";
+            String description = "Daily yoga session reminders";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
 
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+            channel.enableVibration(true);
+            channel.setVibrationPattern(new long[]{0, 500, 1000});
 
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
@@ -46,28 +48,30 @@ public class NotificationUtils {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
-        // Build the notification
+        // Build the notification in English
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_yoga)
-                .setContentTitle(title)
-                .setContentText(message)
+                .setContentTitle("Time for Yoga! 🧘‍♀️")
+                .setContentText("Your daily yoga session is ready to begin!")
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText("Take a few minutes to relax and strengthen your body and mind. " +
+                                "Your wellness journey continues today. Namaste! 🙏"))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setVibrate(new long[]{0, 500, 1000})
+                .setDefaults(NotificationCompat.DEFAULT_SOUND);
 
         // Show the notification with permission check
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
         // Check for notification permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // For Android 13+
             if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
                     == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 notificationManager.notify(NOTIFICATION_ID, builder.build());
             }
-            // Nếu không có quyền, bạn có thể xử lý ở đây (ví dụ: ghi log)
         } else {
-            // For Android 12 and below, no runtime permission needed
             notificationManager.notify(NOTIFICATION_ID, builder.build());
         }
     }
