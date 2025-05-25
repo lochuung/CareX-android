@@ -42,8 +42,9 @@ public interface ProgressDao {
     int getCompletedDaysInTimeRange(String userId, long startTime, long endTime);
 
     @Query("SELECT SUM(calories) FROM progress WHERE userId = :userId AND completionTimestamp BETWEEN :startTime AND :endTime")
-    int getTotalCaloriesInTimeRange(String userId, long startTime, long endTime);
-
-    @Query("SELECT AVG(averageConfidence) FROM progress WHERE userId = :userId AND isCompleted = 1")
+    int getTotalCaloriesInTimeRange(String userId, long startTime, long endTime);    @Query("SELECT AVG(averageConfidence) FROM progress WHERE userId = :userId AND isCompleted = 1")
     float getAverageConfidence(String userId);
+
+    @Query("DELETE FROM progress WHERE userId = :userId")
+    void deleteAllProgressForUser(String userId);
 }

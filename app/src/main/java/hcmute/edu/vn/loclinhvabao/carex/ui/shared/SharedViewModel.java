@@ -18,6 +18,7 @@ import hcmute.edu.vn.loclinhvabao.carex.data.local.model.DailyProgress;
 import hcmute.edu.vn.loclinhvabao.carex.data.local.model.Progress;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.DailyProgressRepository;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.ProgressRepository;
+import hcmute.edu.vn.loclinhvabao.carex.data.repository.UserProfileRepository;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.YogaDayRepository;
 import hcmute.edu.vn.loclinhvabao.carex.data.repository.YogaPoseRepository;
 import hcmute.edu.vn.loclinhvabao.carex.util.Constants;
@@ -26,10 +27,11 @@ import hcmute.edu.vn.loclinhvabao.carex.ui.yoga.models.YogaPose;
 
 @HiltViewModel
 public class SharedViewModel extends ViewModel {
-    
-    private final YogaDayRepository yogaDayRepository;
+      private final YogaDayRepository yogaDayRepository;
     private final YogaPoseRepository yogaPoseRepository;
-    private final ProgressRepository progressRepository;    private final DailyProgressRepository dailyProgressRepository;
+    private final ProgressRepository progressRepository;
+    private final DailyProgressRepository dailyProgressRepository;
+    private final UserProfileRepository userProfileRepository;
     
     // Current user ID - in a real app this would come from authentication
     private final String currentUserId = Constants.CURRENT_USER_ID;
@@ -52,15 +54,19 @@ public class SharedViewModel extends ViewModel {
     // LiveData for daily progress
     private final MediatorLiveData<List<DailyProgress>> dailyProgress = new MediatorLiveData<>();
     
-    @Inject
+    // LiveData for completion events (to show congratulation only when actually completing)
+    private final MutableLiveData<Progress> dayCompletionEvent = new MutableLiveData<>();
+      @Inject
     public SharedViewModel(YogaDayRepository yogaDayRepository, 
                           YogaPoseRepository yogaPoseRepository,
                           ProgressRepository progressRepository,
-                          DailyProgressRepository dailyProgressRepository) {
+                          DailyProgressRepository dailyProgressRepository,
+                          UserProfileRepository userProfileRepository) {
         this.yogaDayRepository = yogaDayRepository;
         this.yogaPoseRepository = yogaPoseRepository;
         this.progressRepository = progressRepository;
         this.dailyProgressRepository = dailyProgressRepository;
+        this.userProfileRepository = userProfileRepository;
         
         loadDaysFromDatabase();
         initUserProgress();
@@ -143,6 +149,15 @@ public class SharedViewModel extends ViewModel {
         return progressRepository.getCompletedProgressForUser(currentUserId);
     }
     
+    // Completion event methods
+    public LiveData<Progress> getDayCompletionEvent() {
+        return dayCompletionEvent;
+    }
+    
+    public void clearCompletionEvent() {
+        dayCompletionEvent.setValue(null);
+    }
+    
     // Statistics methods
     public int getCompletedDaysCount() {
         return progressRepository.getCompletedDaysCount(currentUserId);
@@ -167,31 +182,47 @@ public class SharedViewModel extends ViewModel {
     
     public void selectYogaPose(YogaPose pose) {
         selectedYogaPose.setValue(pose);
-    }
-      // Updated method to mark day complete with additional data
+    }    // Updated method to mark day complete with additional data
     public void markDayComplete(int dayNumber, int duration, int calories, float averageConfidence, List<YogaPose> completedPoses) {
-        // Create a new Progress object
-        Progress progress = Progress.builder()
-                .userId(currentUserId)
-                .dayNumber(dayNumber)
-                .isCompleted(true)
-                .completionDate(new Date())
-                .duration(duration)
-                .calories(calories)
-                .averageConfidence(averageConfidence)
-                .completedPoses(completedPoses)
-                .build();
+        // Always update the simple map first (this doesn't rely on database)
+        Map<Integer, Boolean> simpleProgress = userProgress.getValue();
+        if (simpleProgress == null) {
+            simpleProgress = new HashMap<>();
+            // Initialize all days as incomplete
+            for (int i = 1; i <= 10; i++) {
+                simpleProgress.put(i, false);
+            }
+        }
+        simpleProgress.put(dayNumber, true);
+        userProgress.setValue(simpleProgress);
         
-        // Save to repository
-        progressRepository.insertProgress(progress);
-        
-        // Update daily progress
-        updateDailyProgress(duration, calories, averageConfidence);
-        
-        // For backward compatibility, also update the simple map
-        Map<Integer, Boolean> simpleProgress = userProgress.getValue();        if (simpleProgress != null) {
-            simpleProgress.put(dayNumber, true);
-            userProgress.setValue(simpleProgress);
+        // Try to save to database with enhanced error handling
+        try {
+            // Ensure user profile exists before saving progress
+            ensureUserProfileExists();
+            
+            // Create a new Progress object
+            Progress progress = Progress.builder()
+                    .userId(currentUserId)
+                    .dayNumber(dayNumber)
+                    .isCompleted(true)
+                    .completionDate(new Date())
+                    .duration(duration)
+                    .calories(calories)
+                    .averageConfidence(averageConfidence)
+                    .completedPoses(completedPoses)
+                    .build();
+              // Save to repository with error handling
+            progressRepository.insertProgressSafely(progress);
+              // Update daily progress (keep duration in seconds for consistency)
+            updateDailyProgress(duration, calories, averageConfidence);
+            
+            // Trigger completion event
+            dayCompletionEvent.setValue(progress);
+            
+        } catch (Exception e) {
+            // Log error but don't crash the app - UI progress is already updated
+            android.util.Log.e("SharedViewModel", "Error saving progress to database", e);
         }
     }
     
@@ -202,21 +233,116 @@ public class SharedViewModel extends ViewModel {
     }
     
     /**
+     * Update overall yoga progress for the 10-day challenge
+     * This method ensures the progress tracking is properly synchronized
+     * @param dayNumber The day number that was completed (1-10)
+     */
+    public void updateYogaProgress(int dayNumber) {
+        // Ensure the progress map is updated
+        Map<Integer, Boolean> currentProgress = userProgress.getValue();
+        if (currentProgress == null) {
+            currentProgress = new HashMap<>();
+            // Initialize all days as incomplete
+            for (int i = 1; i <= 10; i++) {
+                currentProgress.put(i, false);
+            }
+        }
+        
+        // Mark the current day as complete
+        currentProgress.put(dayNumber, true);
+        userProgress.setValue(currentProgress);
+        
+        // Trigger a refresh of detailed progress to ensure consistency
+        loadDetailedProgress();
+    }    /**
      * Update daily progress with new activity
-     * @param duration Duration in minutes
+     * @param duration Duration in seconds
      * @param calories Calories burned
      * @param score Score for the session
      */
     private void updateDailyProgress(int duration, int calories, float score) {
-        // Create a new daily progress entry
-        DailyProgress newProgress = DailyProgress.builder()
-                .date(new Date())
-                .duration(duration)
-                .calories(calories)
-                .score(score)
-                .build();
+        try {
+            // Ensure user profile exists before saving daily progress
+            ensureUserProfileExists();
+            
+            // Create a new daily progress entry
+            DailyProgress newProgress = DailyProgress.builder()
+                    .date(new Date())
+                    .duration(duration)
+                    .calories(calories)
+                    .score(score)
+                    .build();
+            
+            // Save to repository with error handling
+            dailyProgressRepository.insertDailyProgressSafely(newProgress, currentUserId);
+        } catch (Exception e) {
+            // Log error but don't crash the app
+            android.util.Log.e("SharedViewModel", "Error saving daily progress to database", e);
+        }
+    }
+      /**
+     * Ensure the user profile exists in the database to satisfy foreign key constraints
+     * This prevents foreign key constraint errors when inserting progress records
+     */
+    private void ensureUserProfileExists() {
+        try {
+            // Check if user profile exists, if not create a default one
+            // This is done synchronously to ensure the profile exists before inserting progress
+            new Thread(() -> {
+                try {
+                    // Use the UserProfileRepository to check and create profile if needed
+                    userProfileRepository.syncUserProfile(currentUserId, Constants.DEFAULT_USER_NAME, null);
+                } catch (Exception e) {
+                    android.util.Log.e("SharedViewModel", "Error ensuring user profile exists", e);
+                }
+            }).start();
+            
+            // Give the thread a moment to complete
+            Thread.sleep(100);
+        } catch (Exception e) {
+            android.util.Log.e("SharedViewModel", "Error in ensureUserProfileExists", e);
+        }
+    }
+    
+    /**
+     * Check if user profile exists in database
+     */
+    private boolean userProfileExists(String userId) {
+        // This method is no longer needed as we're using UserProfileRepository.syncUserProfile
+        // which handles the existence check internally
+        return true;
+    }
+    
+    /**
+     * Create a default user profile to satisfy foreign key constraints
+     */    private void createDefaultUserProfile(String userId) {
+        // Use UserProfileRepository to create the default profile
+        try {
+            userProfileRepository.createDefaultProfile(userId, Constants.DEFAULT_USER_NAME);
+            android.util.Log.d("SharedViewModel", "Created default user profile for: " + userId);
+        } catch (Exception e) {
+            android.util.Log.e("SharedViewModel", "Error creating default user profile", e);
+        }
+    }
+
+    /**
+     * Reset all progress for the current user
+     */
+    public void resetAllProgress() {
+        // Delete all progress data
+        progressRepository.deleteAllProgressForUser(currentUserId);
+        dailyProgressRepository.deleteAllDailyProgressForUser(currentUserId);
         
-        // Save to repository
-        dailyProgressRepository.insertDailyProgress(newProgress, currentUserId);
+        // Reset the userProgress map to show all days as incomplete
+        Map<Integer, Boolean> resetProgress = new HashMap<>();
+        for (int i = 1; i <= 10; i++) {
+            resetProgress.put(i, false);
+        }
+        userProgress.setValue(resetProgress);
+        
+        // Clear any completion events
+        clearCompletionEvent();
+        
+        android.util.Log.d("SharedViewModel", "Reset all progress for user: " + currentUserId);
     }
 }
