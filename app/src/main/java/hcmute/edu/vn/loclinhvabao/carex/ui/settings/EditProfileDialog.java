@@ -7,7 +7,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,7 +33,7 @@ public class EditProfileDialog {
 
     // UI Components
     private TextInputEditText etName, etHeight, etWeight, etAge;
-    private AutoCompleteTextView spinnerYogaGoal;
+    private MaterialAutoCompleteTextView spinnerYogaGoal;
     private TextView tvBmiValue;
     private MaterialButton btnSave, btnCancel;
 
